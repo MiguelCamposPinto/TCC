@@ -1,0 +1,17 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_main"
+        android:title="Main" />
+<!--        android:icon="@drawable/ic_dashboard"-->
+
+    <item
+        android:id="@+id/nav_locais"
+        android:title="Locais" />
+<!--        android:icon="@drawable/ic_location"-->
+
+    <item
+        android:id="@+id/nav_conta"
+        android:title="Conta" />
+<!--        android:icon="@drawable/ic_account"-->
+
+</menu>

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "25946719895",
+    "project_id": "tccapp-ebdd7",
+    "storage_bucket": "tccapp-ebdd7.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:25946719895:android:fb7c65bafce630c1eb0bd2",
+        "android_client_info": {
+          "package_name": "com.example.tcc"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCBShAKtTgKUxzOT_WdPYUKa4Y8lyM3HEk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
