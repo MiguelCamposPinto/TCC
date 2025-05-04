@@ -4,17 +4,14 @@ import android.app.Activity;
 import android.content.Intent;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-
 import com.example.tcc.MainActivity;
-import com.example.tcc.view.AdminMainActivity;
-import com.example.tcc.view.LoginActivity;
-import com.example.tcc.view.RegisterActivity;
+import com.example.tcc.view.admin.AdminMainActivity;
+import com.example.tcc.view.auth.LoginActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.DocumentSnapshot;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,7 +33,7 @@ public class AuthService {
                 data.put("name", name);
                 data.put("email", user.getEmail());
                 data.put("type", userType);
-                data.put("predioID", "");
+                data.put("buildingIds", new ArrayList<String>()); // Lista de prédios, vazia no início
 
                 db.collection("users").document(user.getUid()).set(data).addOnSuccessListener(unused -> {
                     Toast.makeText(activity, "Cadastro realizado com sucesso!", Toast.LENGTH_SHORT).show();
@@ -47,6 +44,7 @@ public class AuthService {
             }
         });
     }
+
 
     public void loginUser(String email, String password, Activity activity) {
         auth.signInWithEmailAndPassword(email, password).addOnCompleteListener(task -> {

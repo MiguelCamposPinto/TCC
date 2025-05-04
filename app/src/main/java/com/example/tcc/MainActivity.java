@@ -10,8 +10,8 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.example.tcc.view.LoginActivity;
-import com.example.tcc.view.RegisterActivity;
+import com.example.tcc.view.auth.LoginActivity;
+import com.example.tcc.view.auth.RegisterActivity;
 
 public class MainActivity extends AppCompatActivity {
 

@@ -1,4 +1,4 @@
-package com.example.tcc.view;
+package com.example.tcc.view.admin;
 
 import android.os.Bundle;
 
@@ -25,7 +25,7 @@ public class AdminMainActivity extends AppCompatActivity {
             if (item.getItemId() == R.id.nav_main) {
                 selected = new AdminMainFragment();
             } else if (item.getItemId() == R.id.nav_locais) {
-                selected = new AdminGerenciaFragment();
+                selected = new CreatePlaceFragment();
             } else if (item.getItemId() == R.id.nav_conta) {
                 selected = new AdminContaFragment();
             }

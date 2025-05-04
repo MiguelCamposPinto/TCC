@@ -1,10 +1,9 @@
-package com.example.tcc.view;
+package com.example.tcc.view.auth;
 
 
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 

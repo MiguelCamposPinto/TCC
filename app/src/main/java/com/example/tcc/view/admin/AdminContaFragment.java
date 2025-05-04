@@ -1,4 +1,4 @@
-package com.example.tcc.view;
+package com.example.tcc.view.admin;
 
 import android.os.Bundle;
 

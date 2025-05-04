@@ -13,13 +13,13 @@
         android:theme="@style/Theme.TCC"
         tools:targetApi="31">
         <activity
-            android:name=".view.AdminMainActivity"
+            android:name=".view.admin.AdminMainActivity"
             android:exported="false" />
         <activity
-            android:name=".view.RegisterActivity"
+            android:name=".view.auth.RegisterActivity"
             android:exported="false" />
         <activity
-            android:name=".view.LoginActivity"
+            android:name=".view.auth.LoginActivity"
             android:exported="false" />
         <activity
             android:name=".MainActivity"

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <EditText
+        android:id="@+id/editTextSpaceName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Nome do Espaço"
+        android:inputType="text"
+        android:layout_marginBottom="10dp"/>
+
+    <EditText
+        android:id="@+id/editTextSpaceType"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Tipo de Espaço (ex: Lavanderia, Quadra)"
+        android:inputType="text"
+        android:layout_marginBottom="20dp"/>
+
+    <Button
+        android:id="@+id/buttonCreateSpace"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Criar Espaço"
+        android:textSize="18sp"/>
+</LinearLayout>
