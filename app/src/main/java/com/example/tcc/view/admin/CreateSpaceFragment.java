@@ -74,11 +74,17 @@ public class CreateSpaceFragment extends Fragment {
         spaceData.put("type", type);
         spaceData.put("buildingId", buildingId);
 
-        db.collection("spaces").add(spaceData).addOnSuccessListener(documentReference -> {
-            Toast.makeText(getContext(), "Espaço criado com sucesso!", Toast.LENGTH_SHORT).show();
-            getParentFragmentManager().popBackStack();
-        }).addOnFailureListener(e -> {
-            Toast.makeText(getContext(), "Erro ao criar espaço: " + e.getMessage(), Toast.LENGTH_LONG).show();
-        });
+        db.collection("predios")
+                .document(buildingId)
+                .collection("spaces")
+                .add(spaceData)
+                .addOnSuccessListener(documentReference -> {
+                    Toast.makeText(getContext(), "Espaço criado com sucesso!", Toast.LENGTH_SHORT).show();
+                    getParentFragmentManager().popBackStack();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(getContext(), "Erro ao criar espaço: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                });
     }
+
 }

@@ -52,25 +52,23 @@ public class AdminMainFragment extends Fragment {
     }
 
     private void loadAdminBuildings() {
-        String uid = auth.getCurrentUser().getUid();
-        db.collection("predios")
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    if (!queryDocumentSnapshots.isEmpty()) {
-                        buildingList.clear();
-                        for (DocumentSnapshot snapshot : queryDocumentSnapshots.getDocuments()) {
-                            String name = snapshot.getString("name");
-                            String address = snapshot.getString("address");
-                            String buildingId = snapshot.getId();
+        String currentAdminId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-                            buildingList.add(new Building(buildingId, name, address));
-                        }
-                        adapter.notifyDataSetChanged();
+        db.collection("predios")
+                .whereEqualTo("adminId", currentAdminId)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    buildingList.clear();
+                    for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
+                        Building b = doc.toObject(Building.class);
+                        b.setId(doc.getId());
+                        buildingList.add(b);
                     }
+                    adapter.notifyDataSetChanged();
                 })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(getContext(), "Erro ao carregar prédios", Toast.LENGTH_SHORT).show();
-                });
+                .addOnFailureListener(e ->
+                        Toast.makeText(getContext(), "Erro ao carregar prédios", Toast.LENGTH_SHORT).show()
+                );
     }
 }
 

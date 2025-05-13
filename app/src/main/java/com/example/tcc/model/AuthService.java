@@ -33,7 +33,6 @@ public class AuthService {
                 data.put("name", name);
                 data.put("email", user.getEmail());
                 data.put("type", userType);
-                data.put("buildingIds", new ArrayList<String>()); // Lista de prédios, vazia no início
 
                 db.collection("users").document(user.getUid()).set(data).addOnSuccessListener(unused -> {
                     Toast.makeText(activity, "Cadastro realizado com sucesso!", Toast.LENGTH_SHORT).show();

@@ -10,22 +10,26 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Nome do Prédio"
-        android:textSize="20sp"
-        android:layout_marginBottom="10dp"
-        android:textStyle="bold"/>
+        android:textSize="18sp"
+        android:layout_marginTop="16dp"/>
 
     <TextView
         android:id="@+id/textBuildingAddress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Endereço do Prédio"
-        android:textSize="16sp"
-        android:layout_marginBottom="20dp"/>
+        android:text="Endereço"
+        android:layout_marginBottom="16dp"/>
 
     <Button
         android:id="@+id/buttonAddSpace"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Adicionar Espaço"
-        android:textSize="18sp"/>
+        android:text="Adicionar Espaço" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerSpaces"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        android:layout_weight="1" />
 </LinearLayout>
