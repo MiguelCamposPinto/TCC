@@ -7,6 +7,7 @@ import android.widget.Toast;
 import com.example.tcc.MainActivity;
 import com.example.tcc.view.admin.AdminMainActivity;
 import com.example.tcc.view.auth.LoginActivity;
+import com.example.tcc.view.user.UserMainActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -73,7 +74,7 @@ public class AuthService {
             intent = new Intent(activity, AdminMainActivity.class);
         } else {
             Toast.makeText(activity, "USER", Toast.LENGTH_LONG).show();
-            intent = new Intent(activity, MainActivity.class);
+            intent = new Intent(activity, UserMainActivity.class);
         }
         activity.startActivity(intent);
         activity.finish();

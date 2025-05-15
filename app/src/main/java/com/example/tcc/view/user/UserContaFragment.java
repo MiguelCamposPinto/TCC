@@ -1,4 +1,4 @@
-package com.example.tcc.view.admin;
+package com.example.tcc.view.user;
 
 import android.os.Bundle;
 
@@ -12,12 +12,12 @@ import android.widget.Button;
 import com.example.tcc.R;
 import com.example.tcc.controller.AuthController;
 
-public class AdminContaFragment extends Fragment {
+public class UserContaFragment extends Fragment {
 
     private Button btnLogout;
     private AuthController authController;
 
-    public AdminContaFragment() {
+    public UserContaFragment() {
     }
 
     @Override

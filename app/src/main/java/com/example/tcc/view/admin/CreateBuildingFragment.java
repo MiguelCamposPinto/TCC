@@ -22,7 +22,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CreatePlaceFragment extends Fragment {
+public class CreateBuildingFragment extends Fragment {
     private EditText nameInput, addressInput;
     private Button createButton;
     private FirebaseAuth auth;
