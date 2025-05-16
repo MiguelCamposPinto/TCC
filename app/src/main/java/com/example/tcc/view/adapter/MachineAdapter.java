@@ -4,20 +4,24 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
+import com.example.tcc.R;
 import com.example.tcc.model.Machine;
-
 import java.util.List;
 
 public class MachineAdapter extends RecyclerView.Adapter<MachineAdapter.ViewHolder> {
 
-    private List<Machine> machineList;
+    public interface OnMachineClickListener {
+        void onClick(Machine machine);
+    }
 
-    public MachineAdapter(List<Machine> machineList) {
+    private List<Machine> machineList;
+    private OnMachineClickListener listener;
+
+    public MachineAdapter(List<Machine> machineList, OnMachineClickListener listener) {
         this.machineList = machineList;
+        this.listener = listener;
     }
 
     @NonNull
@@ -32,6 +36,12 @@ public class MachineAdapter extends RecyclerView.Adapter<MachineAdapter.ViewHold
         Machine machine = machineList.get(position);
         holder.name.setText(machine.getName());
         holder.status.setText("Status: " + machine.getStatus());
+
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onClick(machine);
+            }
+        });
     }
 
     @Override

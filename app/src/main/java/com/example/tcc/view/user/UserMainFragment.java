@@ -47,7 +47,7 @@ public class UserMainFragment extends Fragment {
 
         btnEnter.setOnClickListener(v -> {
             if (currentBuildingId != null) {
-                Fragment frag = BuildingDetailsFragment.newInstance(currentBuildingId);
+                Fragment frag = UserSpacesFragment.newInstance(currentBuildingId);
                 requireActivity().getSupportFragmentManager().beginTransaction()
                         .replace(R.id.user_fragment_container, frag)
                         .addToBackStack(null)

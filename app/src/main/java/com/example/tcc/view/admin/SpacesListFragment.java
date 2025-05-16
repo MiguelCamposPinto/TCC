@@ -72,7 +72,14 @@ public class SpacesListFragment extends Fragment {
             spaceId = getArguments().getString(ARG_SPACE_ID);
         }
 
-        machineAdapter = new MachineAdapter(machineList);
+        machineAdapter = new MachineAdapter(machineList, machine -> {
+            Fragment frag = AdminAgendamentosFragment.newInstance(buildingId, spaceId, machine.getId());
+            requireActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.admin_fragment_container, frag)
+                    .addToBackStack(null)
+                    .commit();
+        });
+
         recyclerMachines.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerMachines.setAdapter(machineAdapter);
 
