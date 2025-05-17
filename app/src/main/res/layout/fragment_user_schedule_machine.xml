@@ -1,21 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/datePickerContainer"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?android:colorBackground"
     android:orientation="vertical"
     android:padding="16dp"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:paddingTop="48dp">
 
     <TextView
         android:id="@+id/textSelectedDate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Selecione uma data"
+        android:hint="Escolha uma data"
+        android:textSize="16sp"
+        android:layout_marginTop="12dp"
+        android:textColor="?android:textColorPrimary"
+        android:gravity="center"
         android:padding="12dp"
-        android:background="#DDDDDD"
-        android:textSize="16sp" />
+        android:background="@drawable/bg_input"
+        android:layout_marginBottom="16dp" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerHorarios"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingTop="16dp" />
+        android:layout_height="0dp"
+        android:layout_weight="1" />
 </LinearLayout>

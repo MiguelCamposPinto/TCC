@@ -6,22 +6,21 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.tcc.R;
 import com.example.tcc.model.Agendamento;
 import com.example.tcc.view.adapter.AgendamentoAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -52,9 +51,7 @@ public class UserBookingsFragment extends Fragment {
         recycler = view.findViewById(R.id.recyclerUserBookings);
         recycler.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        adapter = new AgendamentoAdapter(reservas, (agendamento, novoStatus) -> {
-            cancelarReserva(agendamento);
-        });
+        adapter = new AgendamentoAdapter(reservas, (agendamento, novoStatus) -> cancelarReserva(agendamento));
         recycler.setAdapter(adapter);
 
         carregarReservas();
@@ -74,7 +71,6 @@ public class UserBookingsFragment extends Fragment {
                     reservas.clear();
                     for (DocumentSnapshot doc : querySnapshot) {
                         Agendamento ag = doc.toObject(Agendamento.class);
-                        ag.setId(doc.getId());
                         ag.setFirestorePath(doc.getReference().getPath());
 
                         if ("confirmado".equals(ag.getStatus())) {
@@ -87,10 +83,16 @@ public class UserBookingsFragment extends Fragment {
 
                         reservas.add(ag);
                     }
+
+                    Collections.sort(reservas, (a1, a2) -> {
+                        String d1 = a1.getData() + " " + a1.getHoraInicio();
+                        String d2 = a2.getData() + " " + a2.getHoraInicio();
+                        return d2.compareTo(d1);
+                    });
+
                     adapter.notifyDataSetChanged();
                 });
     }
-
 
     private void cancelarReserva(Agendamento agendamento) {
         String path = agendamento.getFirestorePath();

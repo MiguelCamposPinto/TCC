@@ -62,7 +62,7 @@ public class AdminAgendamentosFragment extends Fragment {
 
         adapter = new AgendamentoAdapter(agendamentos, (agendamento, novoStatus) -> {
             atualizarStatusAgendamento(agendamento.getFirestorePath(), novoStatus);
-        });
+        },true);
         recycler.setAdapter(adapter);
 
         carregarAgendamentos();
@@ -85,7 +85,8 @@ public class AdminAgendamentosFragment extends Fragment {
                     agendamentos.clear();
                     for (DocumentSnapshot doc : snapshot.getDocuments()) {
                         Agendamento agendamento = doc.toObject(Agendamento.class);
-                        agendamento.setId(doc.getId());
+                        agendamento.setUserName(doc.getString("userName"));
+                        agendamento.setEspacoNome(doc.getString("espacoNome"));
                         agendamento.setFirestorePath(doc.getReference().getPath());
                         agendamentos.add(agendamento);
                     }

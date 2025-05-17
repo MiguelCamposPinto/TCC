@@ -23,7 +23,7 @@ public class UserContaFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_admin_conta, container, false);
+        View view = inflater.inflate(R.layout.fragment_user_conta, container, false);
 
         authController = new AuthController(requireActivity());
         btnLogout = view.findViewById(R.id.btnLogout);

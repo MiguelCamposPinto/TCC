@@ -85,18 +85,50 @@ public class UserMachinesFragment extends Fragment {
                 .document(spaceId)
                 .collection("maquinas")
                 .get()
-                .addOnSuccessListener(querySnapshot -> {
+                .addOnSuccessListener(snapshot -> {
                     machineList.clear();
-                    for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
-                        Machine m = doc.toObject(Machine.class);
-                        m.setId(doc.getId());
-                        machineList.add(m);
+                    for (DocumentSnapshot doc : snapshot.getDocuments()) {
+                        Machine machine = doc.toObject(Machine.class);
+                        if (machine == null) continue;
+
+                        String machineId = doc.getId();
+                        machine.setId(machineId);
+
+                        // Verifica se a máquina está em uso
+                        db.collection("predios")
+                                .document(buildingId)
+                                .collection("spaces")
+                                .document(spaceId)
+                                .collection("maquinas")
+                                .document(machineId)
+                                .collection("agendamentos")
+                                .whereIn("status", List.of("confirmado", "em_andamento"))
+                                .get()
+                                .addOnSuccessListener(agendamentos -> {
+                                    boolean emUso = false;
+                                    String hoje = new java.text.SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date());
+                                    String agora = new java.text.SimpleDateFormat("HH:mm").format(new java.util.Date());
+
+                                    for (DocumentSnapshot ag : agendamentos.getDocuments()) {
+                                        String data = ag.getString("data");
+                                        String inicio = ag.getString("horaInicio");
+                                        String fim = ag.getString("horaFim");
+
+                                        if (hoje.equals(data) && agora.compareTo(inicio) >= 0 && agora.compareTo(fim) < 0) {
+                                            emUso = true;
+                                            break;
+                                        }
+                                    }
+
+                                    machine.setStatus(emUso ? "em uso" : "livre");
+                                    machineList.add(machine);
+                                    adapter.notifyDataSetChanged();
+                                });
                     }
-                    adapter.notifyDataSetChanged();
                 })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(getContext(), "Erro ao carregar máquinas: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                });
+                .addOnFailureListener(e ->
+                        Toast.makeText(getContext(), "Erro ao carregar máquinas: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
+
 
 }

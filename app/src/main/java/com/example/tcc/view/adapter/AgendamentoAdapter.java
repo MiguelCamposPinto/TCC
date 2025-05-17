@@ -19,10 +19,16 @@ public class AgendamentoAdapter extends RecyclerView.Adapter<AgendamentoAdapter.
 
     private List<Agendamento> agendamentos;
     private OnStatusChangeListener listener;
+    private boolean isAdminView;
 
     public AgendamentoAdapter(List<Agendamento> agendamentos, OnStatusChangeListener listener) {
+        this(agendamentos, listener, false);
+    }
+
+    public AgendamentoAdapter(List<Agendamento> agendamentos, OnStatusChangeListener listener, boolean isAdminView) {
         this.agendamentos = agendamentos;
         this.listener = listener;
+        this.isAdminView = isAdminView;
     }
 
     @NonNull
@@ -37,19 +43,33 @@ public class AgendamentoAdapter extends RecyclerView.Adapter<AgendamentoAdapter.
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Agendamento agendamento = agendamentos.get(position);
 
-        holder.textInfo.setText("Usuário: " + agendamento.getUserId() +
-                "\nData: " + agendamento.getData() +
-                "\nHora: " + agendamento.getHoraInicio() + " - " + agendamento.getHoraFim() +
-                "\nStatus: " + agendamento.getStatus());
+        StringBuilder info = new StringBuilder();
 
-        if (agendamento.getStatus().equals("cancelado") || agendamento.getStatus().equals("finalizado")) {
-            holder.btnCancelar.setVisibility(View.GONE);
-        } else {
-            holder.btnCancelar.setVisibility(View.VISIBLE);
-            holder.btnCancelar.setOnClickListener(v -> listener.onStatusChange(agendamento, "cancelado"));
+        if (isAdminView) {
+            info.append("Usuário: ")
+                    .append(agendamento.getUserName())
+                    .append("\n");
         }
 
+        info.append("Espaço: ")
+                .append(agendamento.getEspacoNome() != null ? agendamento.getEspacoNome() : "-")
+                .append("\n");
+
+        info.append("Máquina: ")
+                .append(agendamento.getMachineName() != null ? agendamento.getMachineName() : "-")
+                .append("\n");
+
+        info.append("Data: ").append(agendamento.getData()).append("\n");
+        info.append("Hora: ").append(agendamento.getHoraInicio()).append(" - ").append(agendamento.getHoraFim()).append("\n");
+        info.append("Status: ").append(agendamento.getStatus());
+
+        holder.textInfo.setText(info.toString());
+
+        boolean isFinalizadoOuCancelado = agendamento.getStatus().equals("cancelado") || agendamento.getStatus().equals("finalizado");
+
         holder.btnConfirmar.setVisibility(View.GONE);
+        holder.btnCancelar.setVisibility(isFinalizadoOuCancelado ? View.GONE : View.VISIBLE);
+        holder.btnCancelar.setOnClickListener(v -> listener.onStatusChange(agendamento, "cancelado"));
     }
 
     @Override

@@ -2,23 +2,24 @@ package com.example.tcc.view.user;
 
 import android.app.DatePickerDialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.DatePicker;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tcc.R;
 import com.example.tcc.model.Agendamento;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -37,9 +38,10 @@ public class UserScheduleMachineFragment extends Fragment {
     private FirebaseFirestore db;
     private FirebaseAuth auth;
 
-    private TextView datePickerText;
+    private TextView textSelectedDate;
     private RecyclerView recyclerHorarios;
     private HorarioAdapter adapter;
+    private LinearLayout datePickerContainer;
 
     private List<String> todosHorarios = Arrays.asList(
             "08:00", "09:00", "10:00", "11:00", "12:00",
@@ -67,12 +69,8 @@ public class UserScheduleMachineFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        datePickerText = view.findViewById(R.id.textSelectedDate);
-        recyclerHorarios = view.findViewById(R.id.recyclerHorarios);
-        recyclerHorarios.setLayoutManager(new LinearLayoutManager(getContext()));
-
-        auth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
+        auth = FirebaseAuth.getInstance();
 
         if (getArguments() != null) {
             buildingId = getArguments().getString(ARG_BUILDING_ID);
@@ -80,14 +78,19 @@ public class UserScheduleMachineFragment extends Fragment {
             machineId = getArguments().getString(ARG_MACHINE_ID);
         }
 
-        datePickerText.setOnClickListener(v -> showDatePicker());
+        textSelectedDate = view.findViewById(R.id.textSelectedDate);
+        datePickerContainer = view.findViewById(R.id.datePickerContainer);
+        recyclerHorarios = view.findViewById(R.id.recyclerHorarios);
+        recyclerHorarios.setLayoutManager(new GridLayoutManager(getContext(), 3));
+
+        textSelectedDate.setOnClickListener(v -> showDatePicker());
     }
 
     private void showDatePicker() {
         Calendar c = Calendar.getInstance();
         new DatePickerDialog(getContext(), (view, year, month, dayOfMonth) -> {
             String data = String.format("%04d-%02d-%02d", year, month + 1, dayOfMonth);
-            datePickerText.setText(data);
+            textSelectedDate.setText(data);
             carregarHorariosDisponiveis(data);
         }, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH)).show();
     }
@@ -117,51 +120,81 @@ public class UserScheduleMachineFragment extends Fragment {
     private void fazerAgendamento(String data, String horaInicio) {
         String userId = auth.getCurrentUser().getUid();
 
-        String horaFim = calcularHoraFim(horaInicio);
-        if (horaFim == null) {
-            Toast.makeText(getContext(), "Horário final inválido.", Toast.LENGTH_SHORT).show();
-            return;
-        }
+        // Pegar nome do usuário
+        db.collection("users").document(userId).get().addOnSuccessListener(userDoc -> {
+            String userName = userDoc.getString("name");
 
-        Agendamento agendamento = new Agendamento(null, userId, data, horaInicio, horaFim, "confirmado");
+            // Pegar nome do espaço
+            db.collection("predios")
+                    .document(buildingId)
+                    .collection("spaces")
+                    .document(spaceId)
+                    .get()
+                    .addOnSuccessListener(spaceDoc -> {
+                        String espacoNome = spaceDoc.getString("name");
 
-        db.collection("predios")
-                .document(buildingId)
-                .collection("spaces")
-                .document(spaceId)
-                .collection("maquinas")
-                .document(machineId)
-                .collection("agendamentos")
-                .add(agendamento)
-                .addOnSuccessListener(ref -> {
-                    Toast.makeText(getContext(), "Reserva confirmada!", Toast.LENGTH_SHORT).show();
-                    requireActivity().getSupportFragmentManager().popBackStack();
-                })
-                .addOnFailureListener(e -> Toast.makeText(getContext(), "Erro ao agendar", Toast.LENGTH_SHORT).show());
+                        // Pegar nome da máquina
+                        db.collection("predios")
+                                .document(buildingId)
+                                .collection("spaces")
+                                .document(spaceId)
+                                .collection("maquinas")
+                                .document(machineId)
+                                .get()
+                                .addOnSuccessListener(machineDoc -> {
+                                    String machineName = machineDoc.getString("name");
+
+                                    String horaFim = calcularHoraFim(horaInicio);
+                                    if (horaFim == null) {
+                                        Toast.makeText(getContext(), "Horário final inválido.", Toast.LENGTH_SHORT).show();
+                                        return;
+                                    }
+
+                                    Agendamento agendamento = new Agendamento(userId, data, horaInicio, horaFim, "confirmado");
+                                    agendamento.setUserName(userName);
+                                    agendamento.setEspacoNome(espacoNome);
+                                    agendamento.setMachineName(machineName);
+
+                                    db.collection("predios")
+                                            .document(buildingId)
+                                            .collection("spaces")
+                                            .document(spaceId)
+                                            .collection("maquinas")
+                                            .document(machineId)
+                                            .collection("agendamentos")
+                                            .add(agendamento)
+                                            .addOnSuccessListener(ref -> {
+                                                Toast.makeText(getContext(), "Reserva confirmada!", Toast.LENGTH_SHORT).show();
+                                                requireActivity().getSupportFragmentManager().popBackStack();
+                                            })
+                                            .addOnFailureListener(e -> {
+                                                Toast.makeText(getContext(), "Erro ao agendar: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                            });
+                                });
+                    });
+        });
     }
+
+
 
     private String calcularHoraFim(String horaInicio) {
         try {
             String[] partes = horaInicio.split(":");
             int h = Integer.parseInt(partes[0]);
-
-            if (h >= 22) return null;
-
-            return String.format("%02d:%02d", h + 1, 0);
+            if (h >= 21) return null;
+            return String.format("%02d:%02d", h + 1,1, 0);
         } catch (Exception e) {
             return null;
         }
     }
-
 
     public interface OnHorarioClickListener {
         void onClick(String hora);
     }
 
     public class HorarioAdapter extends RecyclerView.Adapter<HorarioAdapter.ViewHolder> {
-
-        private List<String> horarios;
-        private OnHorarioClickListener listener;
+        private final List<String> horarios;
+        private final OnHorarioClickListener listener;
 
         public HorarioAdapter(List<String> horarios, OnHorarioClickListener listener) {
             this.horarios = horarios;
@@ -171,15 +204,15 @@ public class UserScheduleMachineFragment extends Fragment {
         @NonNull
         @Override
         public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View v = LayoutInflater.from(parent.getContext()).inflate(android.R.layout.simple_list_item_1, parent, false);
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_horario_slot, parent, false);
             return new ViewHolder(v);
         }
 
         @Override
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
             String hora = horarios.get(position);
-            holder.text.setText(hora);
-            holder.itemView.setOnClickListener(v -> listener.onClick(hora));
+            holder.textHorario.setText(hora);
+            holder.textHorario.setOnClickListener(v -> listener.onClick(hora));
         }
 
         @Override
@@ -188,11 +221,11 @@ public class UserScheduleMachineFragment extends Fragment {
         }
 
         public class ViewHolder extends RecyclerView.ViewHolder {
-            TextView text;
+            TextView textHorario;
 
             public ViewHolder(@NonNull View itemView) {
                 super(itemView);
-                text = itemView.findViewById(android.R.id.text1);
+                textHorario = itemView.findViewById(R.id.textHorarioSlot);
             }
         }
     }

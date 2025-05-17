@@ -3,9 +3,11 @@
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
+    android:layout_marginVertical="8dp"
+    android:layout_marginHorizontal="12dp"
+    card_view:cardElevation="4dp"
     card_view:cardCornerRadius="12dp"
-    card_view:cardElevation="6dp">
+    card_view:cardBackgroundColor="?android:attr/colorBackground">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -17,10 +19,10 @@
             android:id="@+id/textAgendamentoInfo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Informações da reserva"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-            android:textColor="#333333"
-            android:paddingBottom="8dp" />
+            android:text="Informações do agendamento"
+            android:textSize="16sp"
+            android:textColor="?android:attr/textColorPrimary"
+            android:layout_marginBottom="8dp" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -34,19 +36,22 @@
                 android:layout_height="wrap_content"
                 android:text="Confirmar"
                 android:visibility="gone"
-                android:layout_marginEnd="8dp"
-                android:backgroundTint="@android:color/holo_green_light"
-                android:textColor="#FFFFFF" />
+                android:textSize="14sp"
+                android:paddingHorizontal="12dp"
+                android:backgroundTint="#4CAF50"
+                android:textColor="@android:color/white"
+                android:layout_marginEnd="8dp" />
 
             <Button
                 android:id="@+id/btnCancelar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Cancelar"
-                android:backgroundTint="@android:color/holo_red_light"
-                android:textColor="#FFFFFF" />
+                android:textSize="14sp"
+                android:paddingHorizontal="12dp"
+                android:backgroundTint="#F44336"
+                android:textColor="@android:color/white" />
         </LinearLayout>
 
     </LinearLayout>
-
 </androidx.cardview.widget.CardView>
