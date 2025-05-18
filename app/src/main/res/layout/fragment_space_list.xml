@@ -1,34 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:background="?android:colorBackground"
+    android:padding="24dp">
 
     <TextView
         android:id="@+id/textSpaceName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Nome do Espaço"
-        android:textSize="18sp"
-        android:textStyle="bold"/>
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:textColor="?android:textColorPrimary"
+        android:layout_marginBottom="4dp" />
 
     <TextView
         android:id="@+id/textSpaceType"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Tipo do Espaço"
-        android:layout_marginBottom="16dp"/>
+        android:textSize="16sp"
+        android:textColor="?android:textColorSecondary"
+        android:layout_marginBottom="24dp" />
 
     <Button
         android:id="@+id/buttonAddMachine"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Adicionar Máquina"
-        android:layout_marginBottom="12dp" />
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#2196F3"
+        android:paddingVertical="12dp"
+        android:layout_marginBottom="16dp" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerMachines"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"/>
+        android:layout_weight="1" />
 </LinearLayout>

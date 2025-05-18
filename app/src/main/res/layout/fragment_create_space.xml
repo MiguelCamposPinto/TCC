@@ -1,30 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:background="?android:colorBackground"
+    android:padding="24dp">
 
-    <EditText
-        android:id="@+id/editTextSpaceName"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Nome do Espaço"
-        android:inputType="text"
-        android:layout_marginBottom="10dp"/>
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
 
-    <EditText
-        android:id="@+id/editTextSpaceType"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Tipo de Espaço (ex: Lavanderia, Quadra)"
-        android:inputType="text"
-        android:layout_marginBottom="20dp"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Novo Espaço"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:textColor="?android:textColorPrimary"
+            android:layout_marginBottom="32dp" />
 
-    <Button
-        android:id="@+id/buttonCreateSpace"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Criar Espaço"
-        android:textSize="18sp"/>
-</LinearLayout>
+        <EditText
+            android:id="@+id/editTextSpaceName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Nome do Espaço"
+            android:inputType="text"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp"
+            android:textColor="?android:textColorPrimary"
+            android:backgroundTint="?android:textColorPrimary" />
+
+        <EditText
+            android:id="@+id/editTextSpaceType"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Tipo de Espaço (ex: Lavanderia, Quadra)"
+            android:inputType="text"
+            android:padding="12dp"
+            android:layout_marginBottom="24dp"
+            android:textColor="?android:textColorPrimary"
+            android:backgroundTint="?android:textColorPrimary" />
+
+        <Button
+            android:id="@+id/buttonCreateSpace"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Criar Espaço"
+            android:textStyle="bold"
+            android:paddingVertical="12dp"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#2196F3" />
+    </LinearLayout>
+</ScrollView>

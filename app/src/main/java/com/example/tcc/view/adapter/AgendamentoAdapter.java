@@ -67,7 +67,6 @@ public class AgendamentoAdapter extends RecyclerView.Adapter<AgendamentoAdapter.
 
         boolean isFinalizadoOuCancelado = agendamento.getStatus().equals("cancelado") || agendamento.getStatus().equals("finalizado");
 
-        holder.btnConfirmar.setVisibility(View.GONE);
         holder.btnCancelar.setVisibility(isFinalizadoOuCancelado ? View.GONE : View.VISIBLE);
         holder.btnCancelar.setOnClickListener(v -> listener.onStatusChange(agendamento, "cancelado"));
     }
@@ -79,12 +78,11 @@ public class AgendamentoAdapter extends RecyclerView.Adapter<AgendamentoAdapter.
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView textInfo;
-        Button btnConfirmar, btnCancelar;
+        Button btnCancelar;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             textInfo = itemView.findViewById(R.id.textAgendamentoInfo);
-            btnConfirmar = itemView.findViewById(R.id.btnConfirmar);
             btnCancelar = itemView.findViewById(R.id.btnCancelar);
         }
     }

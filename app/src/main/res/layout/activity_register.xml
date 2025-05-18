@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -82,7 +83,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Cadastrar"
-            android:backgroundTint="#4CAF50"
+            android:backgroundTint="#2196F3"
             android:textColor="#FFFFFF"
             android:textStyle="bold"
             android:paddingVertical="12dp" />

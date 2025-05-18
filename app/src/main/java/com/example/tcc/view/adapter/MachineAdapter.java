@@ -1,5 +1,6 @@
 package com.example.tcc.view.adapter;
 
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,15 +28,21 @@ public class MachineAdapter extends RecyclerView.Adapter<MachineAdapter.ViewHold
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(android.R.layout.simple_list_item_2, parent, false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_machine, parent, false);
         return new ViewHolder(v);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Machine machine = machineList.get(position);
+
         holder.name.setText(machine.getName());
-        holder.status.setText("Status: " + machine.getStatus());
+
+        String status = machine.getStatus();
+        boolean emUso = status != null && status.equals("em_uso");
+
+        holder.status.setText(emUso ? "Em uso" : "Livre");
+        holder.status.setBackgroundColor(emUso ? Color.parseColor("#F44336") : Color.parseColor("#4CAF50"));
 
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) {
@@ -54,8 +61,8 @@ public class MachineAdapter extends RecyclerView.Adapter<MachineAdapter.ViewHold
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            name = itemView.findViewById(android.R.id.text1);
-            status = itemView.findViewById(android.R.id.text2);
+            name = itemView.findViewById(R.id.textMachineName);
+            status = itemView.findViewById(R.id.textMachineStatus);
         }
     }
 }

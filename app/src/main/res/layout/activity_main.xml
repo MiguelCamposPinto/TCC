@@ -47,7 +47,7 @@
         android:layout_marginHorizontal="32dp"
         android:text="Entrar"
         android:onClick="login"
-        android:backgroundTint="#4CAF50"
+        android:backgroundTint="#2196F3"
         android:textColor="#FFFFFF"
         android:textStyle="bold"
         android:paddingVertical="12dp"

@@ -3,33 +3,43 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="24dp"
+    android:background="?android:colorBackground">
 
     <TextView
         android:id="@+id/textBuildingName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Nome do Prédio"
-        android:textSize="18sp"
-        android:layout_marginTop="16dp"/>
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:textColor="?android:textColorPrimary"
+        android:layout_marginBottom="4dp" />
 
     <TextView
         android:id="@+id/textBuildingAddress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Endereço"
-        android:layout_marginBottom="16dp"/>
+        android:textSize="16sp"
+        android:textColor="?android:textColorPrimary"
+        android:layout_marginBottom="24dp" />
 
     <Button
         android:id="@+id/buttonAddSpace"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Adicionar Espaço" />
+        android:text="Adicionar Espaço"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#2196F3"
+        android:layout_marginBottom="16dp"
+        android:paddingVertical="12dp" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerSpaces"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="16dp"
-        android:layout_weight="1" />
+        android:layout_weight="1"
+        android:paddingTop="8dp" />
 </LinearLayout>

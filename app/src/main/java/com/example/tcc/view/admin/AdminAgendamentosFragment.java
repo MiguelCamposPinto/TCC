@@ -96,15 +96,21 @@ public class AdminAgendamentosFragment extends Fragment {
 
 
     private void atualizarStatusAgendamento(String firestorePath, String status) {
-        db.document(firestorePath)
-                .update("status", status)
-                .addOnSuccessListener(unused -> {
-                    Toast.makeText(getContext(), "Status atualizado com sucesso!", Toast.LENGTH_SHORT).show();
-                    carregarAgendamentos();
-                })
-                .addOnFailureListener(e ->
-                        Toast.makeText(getContext(), "Erro ao atualizar: " + e.getMessage(), Toast.LENGTH_SHORT).show()
-                );
+        if (status.equals("cancelado")) {
+            db.document(firestorePath)
+                    .delete()
+                    .addOnSuccessListener(unused -> {
+                        Toast.makeText(getContext(), "Reserva removida com sucesso!", Toast.LENGTH_SHORT).show();
+                        carregarAgendamentos();
+                    })
+                    .addOnFailureListener(e -> Toast.makeText(getContext(), "Erro ao remover: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+        } else {
+            db.document(firestorePath)
+                    .update("status", status)
+                    .addOnSuccessListener(unused -> carregarAgendamentos())
+                    .addOnFailureListener(e -> Toast.makeText(getContext(), "Erro ao atualizar", Toast.LENGTH_SHORT).show());
+        }
     }
+
 
 }

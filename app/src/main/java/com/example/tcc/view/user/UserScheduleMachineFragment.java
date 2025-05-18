@@ -2,11 +2,9 @@ package com.example.tcc.view.user;
 
 import android.app.DatePickerDialog;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.DatePicker;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -182,7 +180,7 @@ public class UserScheduleMachineFragment extends Fragment {
             String[] partes = horaInicio.split(":");
             int h = Integer.parseInt(partes[0]);
             if (h >= 21) return null;
-            return String.format("%02d:%02d", h + 1,1, 0);
+            return String.format("%02d:%02d", h + 1, 0);
         } catch (Exception e) {
             return null;
         }

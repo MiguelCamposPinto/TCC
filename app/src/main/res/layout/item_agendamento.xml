@@ -31,18 +31,6 @@
             android:gravity="end">
 
             <Button
-                android:id="@+id/btnConfirmar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Confirmar"
-                android:visibility="gone"
-                android:textSize="14sp"
-                android:paddingHorizontal="12dp"
-                android:backgroundTint="#4CAF50"
-                android:textColor="@android:color/white"
-                android:layout_marginEnd="8dp" />
-
-            <Button
                 android:id="@+id/btnCancelar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

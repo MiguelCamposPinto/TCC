@@ -102,16 +102,16 @@ public class UserBookingsFragment extends Fragment {
         }
 
         db.document(path)
-                .update("status", "cancelado")
+                .delete()
                 .addOnSuccessListener(unused -> {
-                    Toast.makeText(getContext(), "Reserva cancelada com sucesso!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Reserva cancelada e removida com sucesso!", Toast.LENGTH_SHORT).show();
                     carregarReservas();
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(getContext(), "Erro ao cancelar: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    Log.d("cancelarReserva", e.getMessage());
                 });
     }
+
 
     private String verificarStatusAutomatico(Agendamento ag) {
         try {
