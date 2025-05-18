@@ -25,7 +25,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class SpacesListFragment extends Fragment {
 
@@ -119,14 +121,20 @@ public class SpacesListFragment extends Fragment {
                     if (error != null) return;
 
                     machineList.clear();
+                    Set<String> idsAdicionados = new HashSet<>();
+
                     for (DocumentSnapshot doc : snapshot.getDocuments()) {
                         Machine machine = doc.toObject(Machine.class);
                         machine.setId(doc.getId());
 
-                        verificarStatusMaquinaEmTempoReal(machine);
+                        if (!idsAdicionados.contains(machine.getId())) {
+                            idsAdicionados.add(machine.getId());
+                            verificarStatusMaquinaEmTempoReal(machine);
+                        }
                     }
                 });
     }
+
     private void verificarStatusMaquinaEmTempoReal(Machine machine) {
         db.collection("predios")
                 .document(buildingId)

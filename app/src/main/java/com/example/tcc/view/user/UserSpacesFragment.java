@@ -17,7 +17,9 @@ import com.example.tcc.view.adapter.SpacesAdapter;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class UserSpacesFragment extends Fragment {
 
@@ -75,19 +77,27 @@ public class UserSpacesFragment extends Fragment {
         db.collection("predios")
                 .document(buildingId)
                 .collection("spaces")
-                .get()
-                .addOnSuccessListener(querySnapshot -> {
-                    spaceList.clear();
-                    for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
-                        Spaces space = doc.toObject(Spaces.class);
-                        space.setId(doc.getId());
-                        space.setBuildingId(buildingId);
-                        spaceList.add(space);
+                .addSnapshotListener((snapshot, error) -> {
+                    if (error != null || snapshot == null) {
+                        Toast.makeText(getContext(), "Erro ao escutar espaços", Toast.LENGTH_SHORT).show();
+                        return;
                     }
+
+                    spaceList.clear();
+                    Set<String> idsAdicionados = new HashSet<>();
+
+                    for (DocumentSnapshot doc : snapshot.getDocuments()) {
+                        if (!idsAdicionados.contains(doc.getId())) {
+                            Spaces space = doc.toObject(Spaces.class);
+                            space.setId(doc.getId());
+                            space.setBuildingId(buildingId);
+                            spaceList.add(space);
+                            idsAdicionados.add(doc.getId());
+                        }
+                    }
+
                     adapter.notifyDataSetChanged();
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(getContext(), "Erro ao carregar espaços", Toast.LENGTH_SHORT).show();
                 });
     }
+
 }

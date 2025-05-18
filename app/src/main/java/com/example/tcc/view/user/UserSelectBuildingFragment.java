@@ -17,7 +17,9 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class UserSelectBuildingFragment extends Fragment {
 
@@ -58,14 +60,28 @@ public class UserSelectBuildingFragment extends Fragment {
     }
 
     private void loadBuildings() {
-        db.collection("predios").get().addOnSuccessListener(query -> {
-            buildingList.clear();
-            for (DocumentSnapshot doc : query.getDocuments()) {
-                Building b = doc.toObject(Building.class);
-                b.setId(doc.getId());
-                buildingList.add(b);
-            }
-            adapter.notifyDataSetChanged();
-        });
+        db.collection("predios")
+                .addSnapshotListener((snapshot, error) -> {
+                    if (error != null || snapshot == null) {
+                        Toast.makeText(getContext(), "Erro ao escutar prédios", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    buildingList.clear();
+                    Set<String> idsAdicionados = new HashSet<>();
+
+                    for (DocumentSnapshot doc : snapshot.getDocuments()) {
+                        String id = doc.getId();
+                        if (!idsAdicionados.contains(id)) {
+                            Building b = doc.toObject(Building.class);
+                            b.setId(id);
+                            buildingList.add(b);
+                            idsAdicionados.add(id);
+                        }
+                    }
+
+                    adapter.notifyDataSetChanged();
+                });
     }
+
 }
