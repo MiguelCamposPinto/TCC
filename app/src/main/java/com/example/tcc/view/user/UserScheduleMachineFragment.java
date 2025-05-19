@@ -102,17 +102,23 @@ public class UserScheduleMachineFragment extends Fragment {
                 .document(machineId)
                 .collection("agendamentos")
                 .whereEqualTo("data", dataSelecionada)
-                .whereEqualTo("status", "confirmado")
                 .get()
                 .addOnSuccessListener(snapshot -> {
                     List<String> disponiveis = new ArrayList<>(todosHorarios);
+
                     for (DocumentSnapshot doc : snapshot.getDocuments()) {
+                        String status = doc.getString("status");
                         String ocupado = doc.getString("horaInicio");
-                        disponiveis.remove(ocupado);
+
+                        if ("confirmado".equals(status) || "em_andamento".equals(status)) {
+                            disponiveis.remove(ocupado);
+                        }
                     }
+
                     adapter = new HorarioAdapter(disponiveis, horaSelecionada -> fazerAgendamento(dataSelecionada, horaSelecionada));
                     recyclerHorarios.setAdapter(adapter);
                 });
+
     }
 
     private void fazerAgendamento(String data, String horaInicio) {
