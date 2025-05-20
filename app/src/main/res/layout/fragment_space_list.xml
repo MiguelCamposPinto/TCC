@@ -16,15 +16,6 @@
         android:textColor="?android:textColorPrimary"
         android:layout_marginBottom="4dp" />
 
-    <TextView
-        android:id="@+id/textSpaceType"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Tipo do Espaço"
-        android:textSize="16sp"
-        android:textColor="?android:textColorSecondary"
-        android:layout_marginBottom="24dp" />
-
     <Button
         android:id="@+id/buttonAddMachine"
         android:layout_width="match_parent"

@@ -1,11 +1,14 @@
 package com.example.tcc.view.user;
 
+import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -40,6 +43,9 @@ public class UserScheduleMachineFragment extends Fragment {
     private RecyclerView recyclerHorarios;
     private HorarioAdapter adapter;
     private LinearLayout datePickerContainer;
+    private Spinner spinnerCiclo;
+    private static final String[] CICLOS = {"Rápido (1 hora)", "Normal (2 horas)", "Pesado (4 horas)"};
+
 
     private List<String> todosHorarios = Arrays.asList(
             "08:00", "09:00", "10:00", "11:00", "12:00",
@@ -82,18 +88,73 @@ public class UserScheduleMachineFragment extends Fragment {
         recyclerHorarios.setLayoutManager(new GridLayoutManager(getContext(), 3));
 
         textSelectedDate.setOnClickListener(v -> showDatePicker());
+
+        spinnerCiclo = view.findViewById(R.id.spinnerCiclo);
+
+        db.collection("predios")
+                .document(buildingId)
+                .collection("spaces")
+                .document(spaceId)
+                .collection("maquinas")
+                .document(machineId)
+                .get()
+                .addOnSuccessListener(doc -> {
+                    String tipo = doc.getString("type");
+                    if ("lavar".equalsIgnoreCase(tipo)) {
+                        spinnerCiclo.setVisibility(View.VISIBLE);
+
+                        ArrayAdapter<String> ad = new ArrayAdapter<>(
+                                requireContext(),
+                                android.R.layout.simple_spinner_item,
+                                CICLOS
+                        );
+                        ad.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                        spinnerCiclo.setAdapter(ad);
+                    }
+                });
+
     }
 
     private void showDatePicker() {
         Calendar c = Calendar.getInstance();
-        new DatePickerDialog(getContext(), (view, year, month, dayOfMonth) -> {
-            String data = String.format("%04d-%02d-%02d", year, month + 1, dayOfMonth);
+        DatePickerDialog dialog = new DatePickerDialog(getContext(), (view, year, month, dayOfMonth) -> {
+            @SuppressLint("DefaultLocale") String data = String.format("%04d-%02d-%02d", year, month + 1, dayOfMonth);
             textSelectedDate.setText(data);
             carregarHorariosDisponiveis(data);
-        }, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH)).show();
+        }, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH));
+
+        dialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
+        dialog.show();
+
     }
 
     private void carregarHorariosDisponiveis(String dataSelecionada) {
+        List<String> disponiveis = new ArrayList<>(todosHorarios);
+
+        // Verificar se a data selecionada é hoje
+        Calendar cal = Calendar.getInstance();
+        int horaAtual = cal.get(Calendar.HOUR_OF_DAY);
+
+        @SuppressLint("DefaultLocale") String dataHoje = String.format("%04d-%02d-%02d",
+                cal.get(Calendar.YEAR),
+                cal.get(Calendar.MONTH) + 1,
+                cal.get(Calendar.DAY_OF_MONTH)
+        );
+
+        // Se for hoje, remove os horários que já passaram
+        if (dataSelecionada.equals(dataHoje)) {
+            List<String> horariosFuturos = new ArrayList<>();
+            for (String hora : disponiveis) {
+                int h = Integer.parseInt(hora.split(":")[0]);
+                if (h >= horaAtual) {
+                    horariosFuturos.add(hora);
+                }
+            }
+            disponiveis = horariosFuturos;
+        }
+
+        // Consultar agendamentos no Firebase e remover os ocupados
+        List<String> finalDisponiveis = disponiveis;
         db.collection("predios")
                 .document(buildingId)
                 .collection("spaces")
@@ -104,22 +165,20 @@ public class UserScheduleMachineFragment extends Fragment {
                 .whereEqualTo("data", dataSelecionada)
                 .get()
                 .addOnSuccessListener(snapshot -> {
-                    List<String> disponiveis = new ArrayList<>(todosHorarios);
-
                     for (DocumentSnapshot doc : snapshot.getDocuments()) {
                         String status = doc.getString("status");
                         String ocupado = doc.getString("horaInicio");
 
                         if ("confirmado".equals(status) || "em_andamento".equals(status)) {
-                            disponiveis.remove(ocupado);
+                            finalDisponiveis.remove(ocupado);
                         }
                     }
 
-                    adapter = new HorarioAdapter(disponiveis, horaSelecionada -> fazerAgendamento(dataSelecionada, horaSelecionada));
+                    adapter = new HorarioAdapter(finalDisponiveis, horaSelecionada -> fazerAgendamento(dataSelecionada, horaSelecionada));
                     recyclerHorarios.setAdapter(adapter);
                 });
-
     }
+
 
     private void fazerAgendamento(String data, String horaInicio) {
         String userId = auth.getCurrentUser().getUid();

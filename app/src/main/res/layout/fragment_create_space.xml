@@ -31,17 +31,6 @@
             android:textColor="?android:textColorPrimary"
             android:backgroundTint="?android:textColorPrimary" />
 
-        <EditText
-            android:id="@+id/editTextSpaceType"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Tipo de Espaço (ex: Lavanderia, Quadra)"
-            android:inputType="text"
-            android:padding="12dp"
-            android:layout_marginBottom="24dp"
-            android:textColor="?android:textColorPrimary"
-            android:backgroundTint="?android:textColorPrimary" />
-
         <Button
             android:id="@+id/buttonCreateSpace"
             android:layout_width="match_parent"

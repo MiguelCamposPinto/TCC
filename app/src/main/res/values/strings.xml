@@ -2,4 +2,9 @@
     <string name="app_name">TCC</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string-array name="machine_types">
+        <item>Máquina de lavar</item>
+        <item>Máquina de secar</item>
+    </string-array>
+
 </resources>

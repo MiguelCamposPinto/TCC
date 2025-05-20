@@ -35,7 +35,7 @@ public class SpacesListFragment extends Fragment {
     private static final String ARG_SPACE_ID = "spaceId";
 
     private String buildingId, spaceId;
-    private TextView spaceName, spaceType;
+    private TextView spaceName;
     private Button buttonAddMachine;
     private RecyclerView recyclerMachines;
 
@@ -63,7 +63,6 @@ public class SpacesListFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         spaceName = view.findViewById(R.id.textSpaceName);
-        spaceType = view.findViewById(R.id.textSpaceType);
         buttonAddMachine = view.findViewById(R.id.buttonAddMachine);
         recyclerMachines = view.findViewById(R.id.recyclerMachines);
 
@@ -106,7 +105,6 @@ public class SpacesListFragment extends Fragment {
                 .addOnSuccessListener(doc -> {
                     if (doc.exists()) {
                         spaceName.setText(doc.getString("name"));
-                        spaceType.setText(doc.getString("type"));
                     }
                 });
     }

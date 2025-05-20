@@ -40,7 +40,6 @@ public class CreateSpaceFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_create_space, container, false);
 
         spaceNameInput = view.findViewById(R.id.editTextSpaceName);
-        spaceTypeInput = view.findViewById(R.id.editTextSpaceType);
         createSpaceButton = view.findViewById(R.id.buttonCreateSpace);
 
         db = FirebaseFirestore.getInstance();
@@ -57,9 +56,8 @@ public class CreateSpaceFragment extends Fragment {
 
     private void createSpace() {
         String name = spaceNameInput.getText().toString().trim();
-        String type = spaceTypeInput.getText().toString().trim();
 
-        if (name.isEmpty() || type.isEmpty()) {
+        if (name.isEmpty()) {
             Toast.makeText(getContext(), "Preencha todos os campos", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -71,7 +69,6 @@ public class CreateSpaceFragment extends Fragment {
 
         Map<String, Object> spaceData = new HashMap<>();
         spaceData.put("name", name);
-        spaceData.put("type", type);
         spaceData.put("buildingId", buildingId);
 
         db.collection("predios")
