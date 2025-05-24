@@ -9,6 +9,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -62,13 +64,12 @@ public class UserMachinesFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
 
         adapter = new MachineAdapter(machineList, machine -> {
-            // Substitua pelos valores reais
-            Fragment frag = UserScheduleMachineFragment.newInstance(buildingId, spaceId, machine.getId());
-            requireActivity().getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.user_fragment_container, frag)
-                    .addToBackStack(null)
-                    .commit();
+            NavController navController = Navigation.findNavController(requireView());
+            Bundle args = new Bundle();
+            args.putString("buildingId", buildingId);
+            args.putString("spaceId", spaceId);
+            args.putString("machineId", machine.getId());
+            navController.navigate(R.id.action_userMachinesFragment_to_userScheduleMachineFragment, args);
         });
 
         recyclerView.setAdapter(adapter);

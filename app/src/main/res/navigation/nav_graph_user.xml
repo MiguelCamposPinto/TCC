@@ -6,15 +6,48 @@
     <fragment
         android:id="@+id/nav_user_main"
         android:name="com.example.tcc.view.user.UserMainFragment"
-        android:label="Espaços" />
+        android:label="Meu Predio" >
+        <action
+            android:id="@+id/action_nav_user_main_to_userSelectBuildingFragment"
+            app:destination="@id/userSelectBuildingFragment" />
+        <action
+            android:id="@+id/action_nav_user_main_to_userSpacesFragment"
+            app:destination="@id/userSpacesFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/nav_user_bookings"
         android:name="com.example.tcc.view.user.UserBookingsFragment"
-        android:label="Agendamentos" />
+        android:label="Agendamentos" >
+    </fragment>
 
     <fragment
         android:id="@+id/nav_user_conta"
         android:name="com.example.tcc.view.user.UserContaFragment"
-        android:label="Conta" />
+        android:label="Conta" >
+    </fragment>
+    <fragment
+        android:id="@+id/userSelectBuildingFragment"
+        android:name="com.example.tcc.view.user.UserSelectBuildingFragment"
+        android:label="UserSelectBuildingFragment" />
+    <fragment
+        android:id="@+id/userSpacesFragment"
+        android:name="com.example.tcc.view.user.UserSpacesFragment"
+        android:label="UserSpacesFragment" >
+        <action
+            android:id="@+id/action_userSpacesFragment_to_userMachinesFragment"
+            app:destination="@id/userMachinesFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/userMachinesFragment"
+        android:name="com.example.tcc.view.user.UserMachinesFragment"
+        android:label="UserMachinesFragment" >
+        <action
+            android:id="@+id/action_userMachinesFragment_to_userScheduleMachineFragment"
+            app:destination="@id/userScheduleMachineFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/userScheduleMachineFragment"
+        android:name="com.example.tcc.view.user.UserScheduleMachineFragment"
+        android:label="UserScheduleMachineFragment" />
 </navigation>

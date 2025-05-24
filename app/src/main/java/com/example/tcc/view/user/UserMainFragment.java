@@ -10,6 +10,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
 import com.example.tcc.R;
 import com.example.tcc.view.admin.BuildingDetailsFragment;
@@ -38,23 +40,18 @@ public class UserMainFragment extends Fragment {
         btnEnter = view.findViewById(R.id.buttonEnterBuilding);
 
         btnChoose.setOnClickListener(v -> {
-            Fragment frag = new UserSelectBuildingFragment();
-            requireActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.user_fragment_container, frag)
-                    .addToBackStack(null)
-                    .commit();
+            NavController navController = Navigation.findNavController(requireView());
+            navController.navigate(R.id.action_nav_user_main_to_userSelectBuildingFragment);
         });
 
         btnEnter.setOnClickListener(v -> {
             if (currentBuildingId != null) {
-                Fragment frag = UserSpacesFragment.newInstance(currentBuildingId);
-                requireActivity().getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.user_fragment_container, frag)
-                        .addToBackStack(null)
-                        .commit();
+                NavController navController = Navigation.findNavController(requireView());
+                Bundle args = new Bundle();
+                args.putString("buildingId", currentBuildingId);
+                navController.navigate(R.id.action_nav_user_main_to_userSpacesFragment, args);
             }
         });
-
         loadUserBuilding();
         return view;
     }

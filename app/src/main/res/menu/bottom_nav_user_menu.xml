@@ -2,17 +2,15 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/nav_user_main"
-        android:title="Espaços" />
-<!--        android:icon="@drawable/ic_place"-->
-
+        android:icon="@drawable/home"
+        android:title="Meu Prédio" />
     <item
         android:id="@+id/nav_user_bookings"
+        android:icon="@drawable/calendar"
         android:title="Agendamentos" />
-<!--    android:icon="@drawable/ic_calendar"-->
-
     <item
         android:id="@+id/nav_user_conta"
+        android:icon="@drawable/account"
         android:title="Conta" />
-<!--    android:icon="@drawable/ic_person"-->
-
 </menu>
+

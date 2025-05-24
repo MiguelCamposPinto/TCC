@@ -1,11 +1,11 @@
 package com.example.tcc.view.user;
 
 import android.os.Bundle;
+import android.view.View;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
 
@@ -23,8 +23,17 @@ public class UserMainActivity extends AppCompatActivity {
         BottomNavigationView bottomNav = findViewById(R.id.bottom_nav_user);
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.user_fragment_container);
-
         NavController navController = navHostFragment.getNavController();
+
         NavigationUI.setupWithNavController(bottomNav, navController);
+
+        navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
+            int id = destination.getId();
+            boolean isVisible = id == R.id.nav_user_main ||
+                    id == R.id.nav_user_bookings ||
+                    id == R.id.nav_user_conta;
+
+            bottomNav.setVisibility(isVisible ? View.VISIBLE : View.GONE);
+        });
     }
 }

@@ -5,6 +5,8 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -85,11 +87,11 @@ public class SpacesListFragment extends Fragment {
         recyclerMachines.setAdapter(machineAdapter);
 
         buttonAddMachine.setOnClickListener(v -> {
-            CreateMachineFragment frag = CreateMachineFragment.newInstance(buildingId, spaceId);
-            requireActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.admin_fragment_container, frag)
-                    .addToBackStack(null)
-                    .commit();
+            NavController navController = Navigation.findNavController(requireView());
+            Bundle args = new Bundle();
+            args.putString("buildingId", buildingId);
+            args.putString("spaceId", spaceId);
+            navController.navigate(R.id.action_spacesListFragment_to_createMachineFragment, args);
         });
 
         loadSpaceInfo();

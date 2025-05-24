@@ -9,6 +9,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.tcc.R;
@@ -58,11 +60,11 @@ public class UserSpacesFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
 
         adapter = new SpacesAdapter(spaceList, space -> {
-            Fragment frag = UserMachinesFragment.newInstance(buildingId, space.getId());
-            requireActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.user_fragment_container, frag)
-                    .addToBackStack(null)
-                    .commit();
+            NavController navController = Navigation.findNavController(requireView());
+            Bundle args = new Bundle();
+            args.putString("buildingId", buildingId);
+            args.putString("spaceId", space.getId());
+            navController.navigate(R.id.action_userSpacesFragment_to_userMachinesFragment, args);
         });
 
         recyclerView.setAdapter(adapter);

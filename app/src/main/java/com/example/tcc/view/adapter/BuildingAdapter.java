@@ -1,18 +1,19 @@
 package com.example.tcc.view.adapter;
 
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tcc.R;
 import com.example.tcc.model.Building;
-import com.example.tcc.view.admin.BuildingDetailsFragment;
 
 import java.util.List;
 
@@ -41,12 +42,10 @@ public class BuildingAdapter extends RecyclerView.Adapter<BuildingAdapter.Buildi
         holder.address.setText(building.getAddress());
 
         holder.itemView.setOnClickListener(v -> {
-            // Passar o ID do prédio para a tela de detalhes
-            Fragment buildingDetailsFragment = BuildingDetailsFragment.newInstance(building.getId());
-            fragmentManager.beginTransaction()
-                    .replace(R.id.admin_fragment_container, buildingDetailsFragment)
-                    .addToBackStack(null)
-                    .commit();
+            NavController navController = Navigation.findNavController(holder.itemView);
+            Bundle args = new Bundle();
+            args.putString("buildingId", building.getId());
+            navController.navigate(R.id.action_nav_main_to_buildingDetailsFragment, args);
         });
     }
 

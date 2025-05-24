@@ -7,15 +7,46 @@
     <fragment
         android:id="@+id/nav_main"
         android:name="com.example.tcc.view.admin.AdminMainFragment"
-        android:label="Main" />
+        android:label="Meus Prédios" >
+        <action
+            android:id="@+id/action_nav_main_to_buildingDetailsFragment"
+            app:destination="@id/buildingDetailsFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/nav_locais"
         android:name="com.example.tcc.view.admin.CreateBuildingFragment"
-        android:label="Prédios" />
+        android:label="Criar Prédio" />
 
     <fragment
         android:id="@+id/nav_conta"
         android:name="com.example.tcc.view.admin.AdminContaFragment"
         android:label="Conta" />
+    <fragment
+        android:id="@+id/buildingDetailsFragment"
+        android:name="com.example.tcc.view.admin.BuildingDetailsFragment"
+        android:label="BuildingDetailsFragment" >
+        <action
+            android:id="@+id/action_buildingDetailsFragment_to_spacesListFragment"
+            app:destination="@id/spacesListFragment" />
+        <action
+            android:id="@+id/action_buildingDetailsFragment_to_createSpaceFragment"
+            app:destination="@id/createSpaceFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/spacesListFragment"
+        android:name="com.example.tcc.view.admin.SpacesListFragment"
+        android:label="SpacesListFragment" >
+        <action
+            android:id="@+id/action_spacesListFragment_to_createMachineFragment"
+            app:destination="@id/createMachineFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/createSpaceFragment"
+        android:name="com.example.tcc.view.admin.CreateSpaceFragment"
+        android:label="CreateSpaceFragment" />
+    <fragment
+        android:id="@+id/createMachineFragment"
+        android:name="com.example.tcc.view.admin.CreateMachineFragment"
+        android:label="CreateMachineFragment" />
 </navigation>

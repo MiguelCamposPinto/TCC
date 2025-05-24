@@ -4,6 +4,8 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -65,23 +67,21 @@ public class BuildingDetailsFragment extends Fragment {
         loadBuildingDetails();
 
         addSpaceButton.setOnClickListener(v -> {
-            CreateSpaceFragment createSpaceFragment = CreateSpaceFragment.newInstance(buildingId);
-            getParentFragmentManager().beginTransaction()
-                    .replace(R.id.admin_fragment_container, createSpaceFragment)
-                    .addToBackStack(null)
-                    .commit();
-
+            NavController navController = Navigation.findNavController(requireView());
+            Bundle args = new Bundle();
+            args.putString("buildingId", buildingId);
+            navController.navigate(R.id.action_buildingDetailsFragment_to_createSpaceFragment, args);
         });
 
         recyclerSpaces = view.findViewById(R.id.recyclerSpaces);
         recyclerSpaces.setLayoutManager(new LinearLayoutManager(getContext()));
 
         spacesAdapter = new SpacesAdapter(spaceList, space -> {
-            Fragment frag = SpacesListFragment.newInstance(buildingId, space.getId());
-            requireActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.admin_fragment_container, frag)
-                    .addToBackStack(null)
-                    .commit();
+            NavController navController = Navigation.findNavController(requireView());
+            Bundle args = new Bundle();
+            args.putString("buildingId", buildingId);
+            args.putString("spaceId", space.getId());
+            navController.navigate(R.id.action_buildingDetailsFragment_to_spacesListFragment, args);
         });
         recyclerSpaces.setAdapter(spacesAdapter);
         loadSpaces();
