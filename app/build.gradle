@@ -30,6 +30,7 @@ android {
 }
 
 dependencies {
+    implementation libs.firebase.messaging
     implementation libs.play.services.auth
     implementation platform('com.google.firebase:firebase-bom:33.13.0')
     implementation libs.firebase.analytics
@@ -42,6 +43,7 @@ dependencies {
     implementation libs.firebase.auth
     implementation libs.firebase.firestore
     implementation libs.work.runtime
+    implementation libs.google.firebase.messaging
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core
