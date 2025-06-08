@@ -10,4 +10,5 @@ Funcionalidades
 - UI adaptada para usuários e admins
 
 *Contexto Acadêmico
--Este projeto foi desenvolvido como Trabalho de Conclusão de Curso em Engenharia da Computação. Ele tem como base metodológica a abordagem Design Science Research, com foco em resolver um problema real de convivência em ambientes coletivos por meio da tecnologia.
+
+Este projeto foi desenvolvido como Trabalho de Conclusão de Curso em Engenharia da Computação. Ele tem como base metodológica a abordagem Design Science Research, com foco em resolver um problema real de convivência em ambientes coletivos por meio da tecnologia.
