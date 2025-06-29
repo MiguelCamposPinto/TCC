@@ -19,6 +19,7 @@ import com.example.tcc.model.Machine;
 import com.example.tcc.view.adapter.MachineAdapter;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,18 +31,11 @@ public class UserMachinesFragment extends Fragment {
 
     private String buildingId, spaceId;
     private FirebaseFirestore db;
-    private List<Machine> machineList = new ArrayList<>();
+    private final List<Machine> machineList = new ArrayList<>();
+    private final List<ListenerRegistration> listeners = new ArrayList<>();
+
     private RecyclerView recyclerView;
     private MachineAdapter adapter;
-
-    public static UserMachinesFragment newInstance(String buildingId, String spaceId) {
-        UserMachinesFragment fragment = new UserMachinesFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_BUILDING_ID, buildingId);
-        args.putString(ARG_SPACE_ID, spaceId);
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -80,7 +74,7 @@ public class UserMachinesFragment extends Fragment {
     }
 
     private void loadMachines() {
-        db.collection("predios")
+        ListenerRegistration reg = db.collection("predios")
                 .document(buildingId)
                 .collection("spaces")
                 .document(spaceId)
@@ -94,14 +88,18 @@ public class UserMachinesFragment extends Fragment {
                     machineList.clear();
                     for (DocumentSnapshot doc : snapshot.getDocuments()) {
                         Machine machine = doc.toObject(Machine.class);
-                        machine.setId(doc.getId());
-
-                        verificarStatusMaquinaEmTempoReal(machine);
+                        if (machine != null) {
+                            machine.setId(doc.getId());
+                            verificarStatusMaquinaEmTempoReal(machine);
+                        }
                     }
                 });
+
+        listeners.add(reg);
     }
+
     private void verificarStatusMaquinaEmTempoReal(Machine machine) {
-        db.collection("predios")
+        ListenerRegistration reg = db.collection("predios")
                 .document(buildingId)
                 .collection("spaces")
                 .document(spaceId)
@@ -115,14 +113,30 @@ public class UserMachinesFragment extends Fragment {
                     boolean emUso = snapshot != null && !snapshot.isEmpty();
                     machine.setStatus(emUso ? "em_uso" : "livre");
 
-                    if (!machineList.contains(machine)) {
+                    boolean jaExiste = false;
+                    for (Machine m : machineList) {
+                        if (m.getId().equals(machine.getId())) {
+                            m.setStatus(machine.getStatus());
+                            jaExiste = true;
+                            break;
+                        }
+                    }
+                    if (!jaExiste) {
                         machineList.add(machine);
                     }
 
                     adapter.notifyDataSetChanged();
                 });
+
+        listeners.add(reg);
     }
 
-
-
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        for (ListenerRegistration reg : listeners) {
+            reg.remove();
+        }
+        listeners.clear();
+    }
 }

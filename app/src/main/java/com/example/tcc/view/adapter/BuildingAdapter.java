@@ -21,7 +21,6 @@ public class BuildingAdapter extends RecyclerView.Adapter<BuildingAdapter.Buildi
     private final List<Building> buildingList;
     private final FragmentManager fragmentManager;
 
-    // Construtor modificado para receber o FragmentManager
     public BuildingAdapter(List<Building> buildingList, FragmentManager fragmentManager) {
         this.buildingList = buildingList;
         this.fragmentManager = fragmentManager;

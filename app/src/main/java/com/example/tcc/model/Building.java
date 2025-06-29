@@ -1,7 +1,7 @@
 package com.example.tcc.model;
 
 public class Building {
-    private String id; // ID do Firestore
+    private String id;
     private String name;
     private String address;
 

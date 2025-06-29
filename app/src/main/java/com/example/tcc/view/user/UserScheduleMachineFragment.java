@@ -32,6 +32,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class UserScheduleMachineFragment extends Fragment {
 
@@ -48,16 +49,6 @@ public class UserScheduleMachineFragment extends Fragment {
     private HorarioAdapter adapter;
     private LinearLayout datePickerContainer;
     private Spinner spinnerCiclo;
-
-    public static UserScheduleMachineFragment newInstance(String buildingId, String spaceId, String machineId) {
-        UserScheduleMachineFragment fragment = new UserScheduleMachineFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_BUILDING_ID, buildingId);
-        args.putString(ARG_SPACE_ID, spaceId);
-        args.putString(ARG_MACHINE_ID, machineId);
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -86,9 +77,6 @@ public class UserScheduleMachineFragment extends Fragment {
         textSelectedDate.setOnClickListener(v -> showDatePicker());
 
         spinnerCiclo = view.findViewById(R.id.spinnerCiclo);
-        // Parte do código omitida até onViewCreated...
-
-        spinnerCiclo = view.findViewById(R.id.spinnerCiclo);
 
         db.collection("predios")
                 .document(buildingId)
@@ -101,13 +89,37 @@ public class UserScheduleMachineFragment extends Fragment {
                     String tipo = doc.getString("type");
                     if ("lavar".equalsIgnoreCase(tipo)) {
                         spinnerCiclo.setVisibility(View.VISIBLE);
+
+                        List<String> nomesCiclos = new ArrayList<>();
+                        List<Integer> duracoesCiclos = new ArrayList<>();
+
+                        List<Map<String, Object>> ciclos = (List<Map<String, Object>>) doc.get("ciclos");
+
+                        if (ciclos != null && !ciclos.isEmpty()) {
+                            for (Map<String, Object> ciclo : ciclos) {
+                                String nome = (String) ciclo.get("nome");
+                                Long dur = (Long) ciclo.get("duracao");
+                                if (nome != null && dur != null) {
+                                    nomesCiclos.add(nome + " (" + dur + " min)");
+                                    duracoesCiclos.add(dur.intValue());
+                                }
+                            }
+                        }
+
+                        if (nomesCiclos.isEmpty()) {
+                            nomesCiclos.add("Padrão (60 min)");
+                            duracoesCiclos.add(60);
+                        }
+
                         ArrayAdapter<String> adapter = new ArrayAdapter<>(
                                 requireContext(),
                                 android.R.layout.simple_spinner_item,
-                                new String[]{"Rápido (30min)", "Normal (60min)", "Pesado (90min)"}
+                                nomesCiclos
                         );
                         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                         spinnerCiclo.setAdapter(adapter);
+
+                        spinnerCiclo.setTag(duracoesCiclos);
 
                         spinnerCiclo.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                             @Override
@@ -120,7 +132,6 @@ public class UserScheduleMachineFragment extends Fragment {
                         });
                     }
                 });
-
     }
 
     private void showDatePicker() {
@@ -138,11 +149,12 @@ public class UserScheduleMachineFragment extends Fragment {
 
     private void carregarHorariosDisponiveis(String dataSelecionada) {
         int duracaoMinutos;
-        if (spinnerCiclo != null && spinnerCiclo.getVisibility() == View.VISIBLE) {
-            String cicloSelecionado = (String) spinnerCiclo.getSelectedItem();
-            if (cicloSelecionado.contains("30")) duracaoMinutos = 30;
-            else if (cicloSelecionado.contains("90")) duracaoMinutos = 90;
-            else {
+        if (spinnerCiclo.getTag() instanceof List) {
+            List<Integer> duracoes = (List<Integer>) spinnerCiclo.getTag();
+            int pos = spinnerCiclo.getSelectedItemPosition();
+            if (pos >= 0 && pos < duracoes.size()) {
+                duracaoMinutos = duracoes.get(pos);
+            } else {
                 duracaoMinutos = 60;
             }
         } else {
@@ -162,7 +174,6 @@ public class UserScheduleMachineFragment extends Fragment {
                 .whereEqualTo("data", dataSelecionada)
                 .get()
                 .addOnSuccessListener(snapshot -> {
-                    // Remove horários que conflitam
                     for (DocumentSnapshot doc : snapshot.getDocuments()) {
                         String status = doc.getString("status");
                         if (!"confirmado".equals(status) && !"em_andamento".equals(status)) continue;
@@ -170,7 +181,6 @@ public class UserScheduleMachineFragment extends Fragment {
                         String ini = doc.getString("horaInicio");
                         String fim = doc.getString("horaFim");
 
-                        // remove slots que colidem
                         List<String> remover = new ArrayList<>();
                         for (String slot : disponiveis) {
                             String fimSlot = calcularHoraFim(slot, duracaoMinutos);
@@ -181,7 +191,6 @@ public class UserScheduleMachineFragment extends Fragment {
                         disponiveis.removeAll(remover);
                     }
 
-                    // Remove horários que já passaram (se for hoje)
                     if (dataSelecionada.equals(hojeFormatado())) {
                         String agora = horaAtual();
                         disponiveis.removeIf(hora -> hora.compareTo(agora) <= 0);
@@ -215,12 +224,10 @@ public class UserScheduleMachineFragment extends Fragment {
             while (true) {
                 Calendar fimSlot = (Calendar) cal.clone();
                 fimSlot.add(Calendar.MINUTE, duracaoMinutos);
-
-                // Verifica se o horário final ultrapassa 22:00
                 if (fimSlot.after(limite)) break;
 
                 slots.add(sdf.format(cal.getTime()));
-                cal.add(Calendar.MINUTE, 15); // sempre de 30 em 30 na UI
+                cal.add(Calendar.MINUTE, 15);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -231,31 +238,17 @@ public class UserScheduleMachineFragment extends Fragment {
     private void fazerAgendamento(String data, String horaInicio) {
         String userId = auth.getCurrentUser().getUid();
 
-        int duracaoMinutos;
-        if (spinnerCiclo != null && spinnerCiclo.getVisibility() == View.VISIBLE) {
-            String cicloSelecionado = (String) spinnerCiclo.getSelectedItem();
-            if (cicloSelecionado.contains("30")) duracaoMinutos = 30;
-            else if (cicloSelecionado.contains("90")) duracaoMinutos = 90;
-            else {
-                duracaoMinutos = 60;
+        int duracaoMinutos = 60;
+        if (spinnerCiclo.getTag() instanceof List) {
+            List<Integer> duracoes = (List<Integer>) spinnerCiclo.getTag();
+            int pos = spinnerCiclo.getSelectedItemPosition();
+            if (pos >= 0 && pos < duracoes.size()) {
+                duracaoMinutos = duracoes.get(pos);
             }
-        } else {
-            duracaoMinutos = 60;
         }
 
         String horaFim = calcularHoraFim(horaInicio, duracaoMinutos);
-        if (horaFim == null) {
-            Toast.makeText(getContext(), "Horário final inválido.", Toast.LENGTH_SHORT).show();
-            return;
-        }
 
-        // 1. Verificar se o horário ainda não passou
-        if (data.equals(hojeFormatado()) && horaInicio.compareTo(horaAtual()) <= 0) {
-            Toast.makeText(getContext(), "Esse horário já passou.", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        // 2. Verificar conflitos com agendamentos existentes
         db.collection("predios")
                 .document(buildingId)
                 .collection("spaces")
@@ -279,8 +272,7 @@ public class UserScheduleMachineFragment extends Fragment {
                         }
                     }
 
-                    // Se passou nas validações, segue com o agendamento
-                    salvarAgendamento(userId, data, horaInicio, horaFim, duracaoMinutos);
+                    salvarAgendamento(userId, data, horaInicio, horaFim);
                 });
     }
 
@@ -298,7 +290,7 @@ public class UserScheduleMachineFragment extends Fragment {
         return String.format("%04d-%02d-%02d", c.get(Calendar.YEAR), c.get(Calendar.MONTH) + 1, c.get(Calendar.DAY_OF_MONTH));
     }
 
-    private void salvarAgendamento(String userId, String data, String horaInicio, String horaFim, int duracaoMinutos) {
+    private void salvarAgendamento(String userId, String data, String horaInicio, String horaFim) {
         db.collection("users").document(userId).get().addOnSuccessListener(userDoc -> {
             String userName = userDoc.getString("name");
 
@@ -346,7 +338,6 @@ public class UserScheduleMachineFragment extends Fragment {
             h += m / 60;
             m = m % 60;
 
-            // Permitir exatamente até 22:00, mas não depois
             if (h > 22 || (h == 22 && m > 0)) return null;
 
             return String.format("%02d:%02d", h, m);
@@ -354,8 +345,6 @@ public class UserScheduleMachineFragment extends Fragment {
             return null;
         }
     }
-
-
 
     public interface OnHorarioClickListener {
         void onClick(String hora);

@@ -25,13 +25,6 @@ public class CreateSpaceFragment extends Fragment {
     private FirebaseFirestore db;
     private String buildingId;
 
-    public static CreateSpaceFragment newInstance(String buildingId) {
-        CreateSpaceFragment fragment = new CreateSpaceFragment();
-        Bundle args = new Bundle();
-        args.putString("buildingId", buildingId);
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     @Nullable
     @Override
@@ -44,7 +37,6 @@ public class CreateSpaceFragment extends Fragment {
 
         db = FirebaseFirestore.getInstance();
 
-        // PEGAR O buildingId DO BUNDLE
         if (getArguments() != null) {
             buildingId = getArguments().getString("buildingId");
         }

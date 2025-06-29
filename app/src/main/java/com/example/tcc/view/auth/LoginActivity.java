@@ -13,7 +13,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity implements LoginCallback {
 
     private EditText emailInput, passwordInput;
     private Button loginButton;
@@ -35,9 +35,16 @@ public class LoginActivity extends AppCompatActivity {
             String password = passwordInput.getText().toString();
             if (email.isEmpty() || password.isEmpty()) {
                 Toast.makeText(LoginActivity.this, "Preencha todos os campos", Toast.LENGTH_SHORT).show();
+
             } else {
-                authService.loginUser(email, password, LoginActivity.this);
+                loginButton.setEnabled(false);
+                authService.loginUser(email, password, LoginActivity.this,this);
             }
         });
+    }
+
+    @Override
+    public void onLoginFailure() {
+        loginButton.setEnabled(true);
     }
 }

@@ -65,7 +65,6 @@ public class CreateBuildingFragment extends Fragment {
         db.collection("predios").add(buildingData).addOnSuccessListener(documentReference -> {
             String buildingId = documentReference.getId();
 
-            // Atualiza a lista de prédios no usuário admin
             DocumentReference userRef = db.collection("users").document(adminId);
             userRef.update("predios", FieldValue.arrayUnion(buildingId))
                     .addOnSuccessListener(unused -> {

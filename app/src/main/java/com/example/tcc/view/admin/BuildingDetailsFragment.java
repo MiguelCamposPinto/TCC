@@ -15,12 +15,14 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.example.tcc.R;
 import com.example.tcc.model.Spaces;
 import com.example.tcc.view.adapter.SpacesAdapter;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -28,22 +30,15 @@ import java.util.List;
 import java.util.Set;
 
 public class BuildingDetailsFragment extends Fragment {
+
     private FirebaseFirestore db;
     private String buildingId;
     private TextView buildingName, buildingAddress;
     private Button addSpaceButton;
     private RecyclerView recyclerSpaces;
-    private List<Spaces> spaceList = new ArrayList<>();
+    private final List<Spaces> spaceList = new ArrayList<>();
     private SpacesAdapter spacesAdapter;
-
-
-    public static BuildingDetailsFragment newInstance(String buildingId) {
-        BuildingDetailsFragment fragment = new BuildingDetailsFragment();
-        Bundle args = new Bundle();
-        args.putString("buildingId", buildingId);
-        fragment.setArguments(args);
-        return fragment;
-    }
+    private final List<ListenerRegistration> listeners = new ArrayList<>();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -63,19 +58,9 @@ public class BuildingDetailsFragment extends Fragment {
         buildingName = view.findViewById(R.id.textBuildingName);
         buildingAddress = view.findViewById(R.id.textBuildingAddress);
         addSpaceButton = view.findViewById(R.id.buttonAddSpace);
-
-        loadBuildingDetails();
-
-        addSpaceButton.setOnClickListener(v -> {
-            NavController navController = Navigation.findNavController(requireView());
-            Bundle args = new Bundle();
-            args.putString("buildingId", buildingId);
-            navController.navigate(R.id.action_buildingDetailsFragment_to_createSpaceFragment, args);
-        });
-
         recyclerSpaces = view.findViewById(R.id.recyclerSpaces);
-        recyclerSpaces.setLayoutManager(new LinearLayoutManager(getContext()));
 
+        recyclerSpaces.setLayoutManager(new LinearLayoutManager(getContext()));
         spacesAdapter = new SpacesAdapter(spaceList, space -> {
             NavController navController = Navigation.findNavController(requireView());
             Bundle args = new Bundle();
@@ -84,13 +69,22 @@ public class BuildingDetailsFragment extends Fragment {
             navController.navigate(R.id.action_buildingDetailsFragment_to_spacesListFragment, args);
         });
         recyclerSpaces.setAdapter(spacesAdapter);
+
+        addSpaceButton.setOnClickListener(v -> {
+            NavController navController = Navigation.findNavController(requireView());
+            Bundle args = new Bundle();
+            args.putString("buildingId", buildingId);
+            navController.navigate(R.id.action_buildingDetailsFragment_to_createSpaceFragment, args);
+        });
+
+        loadBuildingDetails();
         loadSpaces();
 
         return view;
     }
 
     private void loadSpaces() {
-        db.collection("predios")
+        ListenerRegistration reg = db.collection("predios")
                 .document(buildingId)
                 .collection("spaces")
                 .addSnapshotListener((snapshot, error) -> {
@@ -105,18 +99,20 @@ public class BuildingDetailsFragment extends Fragment {
                     for (DocumentSnapshot doc : snapshot.getDocuments()) {
                         if (!idsAdicionados.contains(doc.getId())) {
                             Spaces space = doc.toObject(Spaces.class);
-                            space.setId(doc.getId());
-                            space.setBuildingId(buildingId);
-                            spaceList.add(space);
-                            idsAdicionados.add(doc.getId());
+                            if (space != null) {
+                                space.setId(doc.getId());
+                                space.setBuildingId(buildingId);
+                                spaceList.add(space);
+                                idsAdicionados.add(doc.getId());
+                            }
                         }
                     }
 
                     spacesAdapter.notifyDataSetChanged();
                 });
+
+        listeners.add(reg);
     }
-
-
 
     private void loadBuildingDetails() {
         DocumentReference buildingRef = db.collection("predios").document(buildingId);
@@ -126,11 +122,17 @@ public class BuildingDetailsFragment extends Fragment {
                 String address = documentSnapshot.getString("address");
                 buildingName.setText(name);
                 buildingAddress.setText(address);
-            } else {
-                Toast.makeText(getContext(), "Erro ao carregar detalhes do prédio", Toast.LENGTH_SHORT).show();
             }
-        }).addOnFailureListener(e -> {
-            Toast.makeText(getContext(), "Erro ao carregar detalhes do prédio", Toast.LENGTH_SHORT).show();
-        });
+        }).addOnFailureListener(e ->
+                Toast.makeText(getContext(), "Erro ao carregar detalhes do prédio", Toast.LENGTH_SHORT).show());
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        for (ListenerRegistration reg : listeners) {
+            reg.remove();
+        }
+        listeners.clear();
     }
 }

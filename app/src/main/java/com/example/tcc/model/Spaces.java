@@ -5,7 +5,7 @@ public class Spaces {
     private String name;
     private String buildingId;
 
-    public Spaces() {} // necessário para o Firestore
+    public Spaces() {}
 
     public Spaces(String id, String name, String buildingId) {
         this.id = id;

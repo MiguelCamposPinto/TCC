@@ -4,15 +4,14 @@ import android.app.Activity;
 import android.content.Intent;
 import android.widget.Toast;
 
-import com.example.tcc.MainActivity;
 import com.example.tcc.view.admin.AdminMainActivity;
 import com.example.tcc.view.auth.LoginActivity;
+import com.example.tcc.view.auth.LoginCallback;
 import com.example.tcc.view.user.UserMainActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,13 +31,17 @@ public class AuthService {
                 FirebaseUser user = auth.getCurrentUser();
                 Map<String, Object> data = new HashMap<>();
                 data.put("name", name);
-                data.put("email", user.getEmail());
+                if (user != null) {
+                    data.put("email", user.getEmail());
+                }
                 data.put("type", userType);
 
-                db.collection("users").document(user.getUid()).set(data).addOnSuccessListener(unused -> {
-                    Toast.makeText(activity, "Cadastro realizado com sucesso!", Toast.LENGTH_SHORT).show();
-                    redirectUser(activity, userType);
-                });
+                if (user != null) {
+                    db.collection("users").document(user.getUid()).set(data).addOnSuccessListener(unused -> {
+                        Toast.makeText(activity, "Cadastro realizado com sucesso!", Toast.LENGTH_SHORT).show();
+                        redirectUser(activity, userType);
+                    });
+                }
             } else {
                 Toast.makeText(activity, "Erro: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
             }
@@ -46,16 +49,19 @@ public class AuthService {
     }
 
 
-    public void loginUser(String email, String password, Activity activity) {
+    public void loginUser(String email, String password, Activity activity, LoginCallback callback) {
         auth.signInWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 FirebaseUser user = auth.getCurrentUser();
-                db.collection("users").document(user.getUid()).get().addOnSuccessListener(documentSnapshot -> {
-                    String userType = documentSnapshot.getString("type");
-                    redirectUser(activity, userType);
-                });
+                if (user != null) {
+                    db.collection("users").document(user.getUid()).get().addOnSuccessListener(documentSnapshot -> {
+                        String userType = documentSnapshot.getString("type");
+                        redirectUser(activity, userType);
+                    });
+                }
             } else {
                 Toast.makeText(activity, "Erro: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                callback.onLoginFailure();
             }
         });
     }

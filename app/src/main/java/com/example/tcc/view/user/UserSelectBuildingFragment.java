@@ -16,6 +16,8 @@ import com.example.tcc.view.adapter.UserBuildingAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -26,7 +28,8 @@ public class UserSelectBuildingFragment extends Fragment {
     private FirebaseFirestore db;
     private FirebaseAuth auth;
     private RecyclerView recyclerView;
-    private List<Building> buildingList = new ArrayList<>();
+    private final List<Building> buildingList = new ArrayList<>();
+    private final List<ListenerRegistration> listeners = new ArrayList<>();
     private UserBuildingAdapter adapter;
 
     @Nullable
@@ -47,7 +50,7 @@ public class UserSelectBuildingFragment extends Fragment {
                     .update("predioID", building.getId())
                     .addOnSuccessListener(unused -> {
                         Toast.makeText(getContext(), "Prédio associado com sucesso!", Toast.LENGTH_SHORT).show();
-                        requireActivity().getSupportFragmentManager().popBackStack(); // volta pra tela anterior
+                        requireActivity().getSupportFragmentManager().popBackStack();
                     })
                     .addOnFailureListener(e ->
                             Toast.makeText(getContext(), "Erro ao associar prédio", Toast.LENGTH_SHORT).show());
@@ -60,7 +63,7 @@ public class UserSelectBuildingFragment extends Fragment {
     }
 
     private void loadBuildings() {
-        db.collection("predios")
+        ListenerRegistration reg = db.collection("predios")
                 .addSnapshotListener((snapshot, error) -> {
                     if (error != null || snapshot == null) {
                         Toast.makeText(getContext(), "Erro ao escutar prédios", Toast.LENGTH_SHORT).show();
@@ -74,14 +77,26 @@ public class UserSelectBuildingFragment extends Fragment {
                         String id = doc.getId();
                         if (!idsAdicionados.contains(id)) {
                             Building b = doc.toObject(Building.class);
-                            b.setId(id);
-                            buildingList.add(b);
-                            idsAdicionados.add(id);
+                            if (b != null) {
+                                b.setId(id);
+                                buildingList.add(b);
+                                idsAdicionados.add(id);
+                            }
                         }
                     }
 
                     adapter.notifyDataSetChanged();
                 });
+
+        listeners.add(reg);
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        for (ListenerRegistration reg : listeners) {
+            reg.remove();
+        }
+        listeners.clear();
+    }
 }

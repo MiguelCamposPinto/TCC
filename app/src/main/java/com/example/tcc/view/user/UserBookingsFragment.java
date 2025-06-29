@@ -1,7 +1,6 @@
 package com.example.tcc.view.user;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,13 +16,10 @@ import com.example.tcc.view.adapter.AgendamentoAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import java.text.SimpleDateFormat;
+import com.google.firebase.firestore.ListenerRegistration;
+
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 public class UserBookingsFragment extends Fragment {
 
@@ -32,6 +28,7 @@ public class UserBookingsFragment extends Fragment {
     private RecyclerView recycler;
     private List<Agendamento> reservas = new ArrayList<>();
     private AgendamentoAdapter adapter;
+    private ListenerRegistration listener;
 
     @Nullable
     @Override
@@ -60,7 +57,7 @@ public class UserBookingsFragment extends Fragment {
     private void carregarReservas() {
         String userId = auth.getCurrentUser().getUid();
 
-        db.collectionGroup("agendamentos")
+        listener = db.collectionGroup("agendamentos")
                 .whereEqualTo("userId", userId)
                 .addSnapshotListener((querySnapshot, error) -> {
                     if (error != null) {
@@ -69,22 +66,17 @@ public class UserBookingsFragment extends Fragment {
                     }
 
                     reservas.clear();
-                    for (DocumentSnapshot doc : querySnapshot) {
-                        Agendamento ag = doc.toObject(Agendamento.class);
-                        ag.setFirestorePath(doc.getReference().getPath());
-
-                        if ("confirmado".equals(ag.getStatus())) {
-                            String novoStatus = verificarStatusAutomatico(ag);
-                            if (!"confirmado".equals(novoStatus)) {
-                                doc.getReference().update("status", novoStatus);
-                                ag.setStatus(novoStatus);
+                    if (querySnapshot != null) {
+                        for (DocumentSnapshot doc : querySnapshot) {
+                            Agendamento ag = doc.toObject(Agendamento.class);
+                            if (ag != null) {
+                                ag.setFirestorePath(doc.getReference().getPath());
                             }
+                            reservas.add(ag);
                         }
-
-                        reservas.add(ag);
                     }
 
-                    Collections.sort(reservas, (a1, a2) -> {
+                    reservas.sort((a1, a2) -> {
                         String d1 = a1.getData() + " " + a1.getHoraInicio();
                         String d2 = a2.getData() + " " + a2.getHoraInicio();
                         return d2.compareTo(d1);
@@ -107,42 +99,15 @@ public class UserBookingsFragment extends Fragment {
                     Toast.makeText(getContext(), "Reserva cancelada e removida com sucesso!", Toast.LENGTH_SHORT).show();
                     carregarReservas();
                 })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(getContext(), "Erro ao cancelar: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                });
+                .addOnFailureListener(e -> Toast.makeText(getContext(), "Erro ao cancelar: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 
-
-    private String verificarStatusAutomatico(Agendamento ag) {
-        try {
-            SimpleDateFormat sdfData = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-            SimpleDateFormat sdfHora = new SimpleDateFormat("HH:mm", Locale.getDefault());
-
-            Date agora = new Date();
-            Date dataAtual = sdfData.parse(sdfData.format(agora));
-            Date horaAtual = sdfHora.parse(sdfHora.format(agora));
-
-            Date dataReserva = sdfData.parse(ag.getData());
-            Date horaInicio = sdfHora.parse(ag.getHoraInicio());
-            Date horaFim = sdfHora.parse(ag.getHoraFim());
-
-            if (dataAtual.before(dataReserva)) {
-                return "confirmado";
-            } else if (dataAtual.equals(dataReserva)) {
-                if (horaAtual.before(horaInicio)) {
-                    return "confirmado";
-                } else if (!horaAtual.before(horaInicio) && horaAtual.before(horaFim)) {
-                    return "em_andamento";
-                } else {
-                    return "finalizado";
-                }
-            } else {
-                return "finalizado";
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ag.getStatus(); // fallback se der erro
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (listener != null) {
+            listener.remove();
+            listener = null;
         }
     }
 }

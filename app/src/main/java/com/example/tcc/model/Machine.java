@@ -7,7 +7,6 @@ public class Machine {
     private String espacoId;
 
     public Machine() {
-        // Construtor vazio necessário para o Firestore
     }
 
     public Machine(String id, String name, String status, String espacoId) {
@@ -17,7 +16,6 @@ public class Machine {
         this.espacoId = espacoId;
     }
 
-    // Getters
     public String getId() {
         return id;
     }
@@ -34,7 +32,6 @@ public class Machine {
         return espacoId;
     }
 
-    // Setters
     public void setId(String id) {
         this.id = id;
     }

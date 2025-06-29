@@ -24,7 +24,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     public void onNewToken(@NonNull String token) {
         super.onNewToken(token);
         Log.d("FCM", "Novo token gerado: " + token);
-        // Aqui você pode salvar o token novamente no Firestore se quiser
     }
 
     @Override
@@ -37,7 +36,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             String titulo = remoteMessage.getNotification().getTitle();
             String corpo = remoteMessage.getNotification().getBody();
 
-            // Criar canal de notificação (necessário para Android 8+)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 NotificationChannel channel = new NotificationChannel(
                         CHANNEL_ID,
@@ -50,9 +48,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 }
             }
 
-            // Criar e exibir a notificação
             NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
-                    .setSmallIcon(R.drawable.ic_launcher_foreground) // troque por um ícone seu se quiser
+                    .setSmallIcon(R.drawable.ic_launcher_foreground)
                     .setContentTitle(titulo)
                     .setContentText(corpo)
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT);

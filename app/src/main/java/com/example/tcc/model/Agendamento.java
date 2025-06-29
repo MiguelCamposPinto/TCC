@@ -58,7 +58,6 @@ public class Agendamento {
         return machineName;
     }
 
-    // Setters
 
     public void setUserId(String userId) {
         this.userId = userId;

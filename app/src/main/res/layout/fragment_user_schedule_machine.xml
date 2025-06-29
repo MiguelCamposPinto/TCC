@@ -27,6 +27,7 @@
         android:visibility="gone"
         android:layout_marginBottom="12dp" />
 
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerHorarios"
         android:layout_width="match_parent"

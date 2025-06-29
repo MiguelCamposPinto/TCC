@@ -24,6 +24,7 @@ import com.example.tcc.view.adapter.MachineAdapter;
 import com.example.tcc.view.adapter.SpacesAdapter;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
@@ -45,15 +46,7 @@ public class SpacesListFragment extends Fragment {
     private MachineAdapter machineAdapter;
 
     private FirebaseFirestore db;
-
-    public static SpacesListFragment newInstance(String buildingId, String spaceId) {
-        SpacesListFragment fragment = new SpacesListFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_BUILDING_ID, buildingId);
-        args.putString(ARG_SPACE_ID, spaceId);
-        fragment.setArguments(args);
-        return fragment;
-    }
+    private final List<ListenerRegistration> listeners = new ArrayList<>();
 
     @Nullable
     @Override
@@ -112,13 +105,13 @@ public class SpacesListFragment extends Fragment {
     }
 
     private void loadMachines() {
-        db.collection("predios")
+        ListenerRegistration reg = db.collection("predios")
                 .document(buildingId)
                 .collection("spaces")
                 .document(spaceId)
                 .collection("maquinas")
                 .addSnapshotListener((snapshot, error) -> {
-                    if (error != null) return;
+                    if (error != null || snapshot == null) return;
 
                     machineList.clear();
                     Set<String> idsAdicionados = new HashSet<>();
@@ -133,10 +126,12 @@ public class SpacesListFragment extends Fragment {
                         }
                     }
                 });
+
+        listeners.add(reg);
     }
 
     private void verificarStatusMaquinaEmTempoReal(Machine machine) {
-        db.collection("predios")
+        ListenerRegistration reg = db.collection("predios")
                 .document(buildingId)
                 .collection("spaces")
                 .document(spaceId)
@@ -150,14 +145,32 @@ public class SpacesListFragment extends Fragment {
                     boolean emUso = snapshot != null && !snapshot.isEmpty();
                     machine.setStatus(emUso ? "em_uso" : "livre");
 
-                    if (!machineList.contains(machine)) {
+                    boolean atualizada = false;
+                    for (Machine m : machineList) {
+                        if (m.getId().equals(machine.getId())) {
+                            m.setStatus(machine.getStatus());
+                            atualizada = true;
+                            break;
+                        }
+                    }
+
+                    if (!atualizada) {
                         machineList.add(machine);
                     }
 
                     machineAdapter.notifyDataSetChanged();
                 });
+
+        listeners.add(reg);
     }
 
-
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        for (ListenerRegistration reg : listeners) {
+            reg.remove();
+        }
+        listeners.clear();
+    }
 }
 

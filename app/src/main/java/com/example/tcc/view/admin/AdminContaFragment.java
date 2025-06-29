@@ -10,12 +10,12 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.example.tcc.R;
-import com.example.tcc.controller.AuthController;
+import com.example.tcc.model.AuthService;
 
 public class AdminContaFragment extends Fragment {
 
     private Button btnLogout;
-    private AuthController authController;
+    private AuthService authService;
 
     public AdminContaFragment() {
     }
@@ -25,10 +25,10 @@ public class AdminContaFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_admin_conta, container, false);
 
-        authController = new AuthController(requireActivity());
+        authService = new AuthService();
         btnLogout = view.findViewById(R.id.btnLogout);
 
-        btnLogout.setOnClickListener(v -> authController.logout());
+        btnLogout.setOnClickListener(v -> authService.logout(requireActivity()));
 
         return view;
     }

@@ -15,6 +15,8 @@ import com.example.tcc.model.Agendamento;
 import com.example.tcc.view.adapter.AgendamentoAdapter;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +29,8 @@ public class AdminAgendamentosFragment extends Fragment {
     private String buildingId, spaceId, machineId;
     private FirebaseFirestore db;
     private RecyclerView recycler;
-    private List<Agendamento> agendamentos = new ArrayList<>();
+    private final List<Agendamento> agendamentos = new ArrayList<>();
+    private final List<ListenerRegistration> listeners = new ArrayList<>();
     private AgendamentoAdapter adapter;
 
     public static AdminAgendamentosFragment newInstance(String buildingId, String spaceId, String machineId) {
@@ -60,16 +63,15 @@ public class AdminAgendamentosFragment extends Fragment {
         recycler = view.findViewById(R.id.recyclerAgendamentos);
         recycler.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        adapter = new AgendamentoAdapter(agendamentos, (agendamento, novoStatus) -> {
-            atualizarStatusAgendamento(agendamento.getFirestorePath(), novoStatus);
-        },true);
+        adapter = new AgendamentoAdapter(agendamentos, (agendamento, novoStatus) ->
+                atualizarStatusAgendamento(agendamento.getFirestorePath(), novoStatus), true);
         recycler.setAdapter(adapter);
 
         carregarAgendamentos();
     }
 
     private void carregarAgendamentos() {
-        db.collection("predios")
+        ListenerRegistration reg = db.collection("predios")
                 .document(buildingId)
                 .collection("spaces")
                 .document(spaceId)
@@ -83,34 +85,42 @@ public class AdminAgendamentosFragment extends Fragment {
                     }
 
                     agendamentos.clear();
-                    for (DocumentSnapshot doc : snapshot.getDocuments()) {
-                        Agendamento agendamento = doc.toObject(Agendamento.class);
-                        agendamento.setUserName(doc.getString("userName"));
-                        agendamento.setEspacoNome(doc.getString("espacoNome"));
-                        agendamento.setFirestorePath(doc.getReference().getPath());
-                        agendamentos.add(agendamento);
+                    if (snapshot != null) {
+                        for (DocumentSnapshot doc : snapshot.getDocuments()) {
+                            Agendamento agendamento = doc.toObject(Agendamento.class);
+                            if (agendamento != null) {
+                                agendamento.setUserName(doc.getString("userName"));
+                                agendamento.setEspacoNome(doc.getString("espacoNome"));
+                                agendamento.setFirestorePath(doc.getReference().getPath());
+                                agendamentos.add(agendamento);
+                            }
+                        }
                     }
                     adapter.notifyDataSetChanged();
                 });
-    }
 
+        listeners.add(reg);
+    }
 
     private void atualizarStatusAgendamento(String firestorePath, String status) {
         if (status.equals("cancelado")) {
             db.document(firestorePath)
                     .delete()
-                    .addOnSuccessListener(unused -> {
-                        Toast.makeText(getContext(), "Reserva removida com sucesso!", Toast.LENGTH_SHORT).show();
-                        carregarAgendamentos();
-                    })
+                    .addOnSuccessListener(unused -> Toast.makeText(getContext(), "Reserva removida com sucesso!", Toast.LENGTH_SHORT).show())
                     .addOnFailureListener(e -> Toast.makeText(getContext(), "Erro ao remover: " + e.getMessage(), Toast.LENGTH_SHORT).show());
         } else {
             db.document(firestorePath)
                     .update("status", status)
-                    .addOnSuccessListener(unused -> carregarAgendamentos())
                     .addOnFailureListener(e -> Toast.makeText(getContext(), "Erro ao atualizar", Toast.LENGTH_SHORT).show());
         }
     }
 
-
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        for (ListenerRegistration reg : listeners) {
+            reg.remove();
+        }
+        listeners.clear();
+    }
 }

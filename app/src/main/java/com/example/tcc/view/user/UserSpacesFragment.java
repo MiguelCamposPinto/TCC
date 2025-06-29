@@ -18,6 +18,8 @@ import com.example.tcc.model.Spaces;
 import com.example.tcc.view.adapter.SpacesAdapter;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -30,16 +32,9 @@ public class UserSpacesFragment extends Fragment {
     private String buildingId;
     private FirebaseFirestore db;
     private RecyclerView recyclerView;
-    private List<Spaces> spaceList = new ArrayList<>();
+    private final List<Spaces> spaceList = new ArrayList<>();
+    private final List<ListenerRegistration> listeners = new ArrayList<>();
     private SpacesAdapter adapter;
-
-    public static UserSpacesFragment newInstance(String buildingId) {
-        UserSpacesFragment fragment = new UserSpacesFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_BUILDING_ID, buildingId);
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -76,7 +71,7 @@ public class UserSpacesFragment extends Fragment {
     }
 
     private void loadSpaces() {
-        db.collection("predios")
+        ListenerRegistration reg = db.collection("predios")
                 .document(buildingId)
                 .collection("spaces")
                 .addSnapshotListener((snapshot, error) -> {
@@ -91,15 +86,27 @@ public class UserSpacesFragment extends Fragment {
                     for (DocumentSnapshot doc : snapshot.getDocuments()) {
                         if (!idsAdicionados.contains(doc.getId())) {
                             Spaces space = doc.toObject(Spaces.class);
-                            space.setId(doc.getId());
-                            space.setBuildingId(buildingId);
-                            spaceList.add(space);
-                            idsAdicionados.add(doc.getId());
+                            if (space != null) {
+                                space.setId(doc.getId());
+                                space.setBuildingId(buildingId);
+                                spaceList.add(space);
+                                idsAdicionados.add(doc.getId());
+                            }
                         }
                     }
 
                     adapter.notifyDataSetChanged();
                 });
+
+        listeners.add(reg);
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        for (ListenerRegistration reg : listeners) {
+            reg.remove();
+        }
+        listeners.clear();
+    }
 }
