@@ -4,7 +4,9 @@ admin.initializeApp();
 
 const db = admin.firestore();
 
-exports.atualizarAgendamentos = functions.https.onRequest(async (req, res) => {
+exports.atualizarAgendamentos = functions
+  .region("southamerica-east1")
+  .https.onRequest(async (req, res) => {
   try {
     const { DateTime } = require("luxon");
 
@@ -14,8 +16,8 @@ exports.atualizarAgendamentos = functions.https.onRequest(async (req, res) => {
 
     const cincoMinDepois = now.plus({ minutes: 5 }).toFormat("HH:mm");
 
-    const snapshot = await db.collectionGroup("agendamentos")
-      .where("data", "==", dataAtual)
+    const snapshot = await db.collectionGroup("reservations")
+      .where("date", "==", dataAtual)
       .where("status", "in", ["confirmado", "em_andamento"])
       .get();
 
@@ -25,7 +27,7 @@ exports.atualizarAgendamentos = functions.https.onRequest(async (req, res) => {
       const ag = doc.data();
       const ref = doc.ref;
 
-      if (!ag.horaInicio || !ag.horaFim || !ag.userId) continue;
+      if (!ag.startTime || !ag.endTime || !ag.userId) continue;
 
       let token = null;
       try {
@@ -38,7 +40,7 @@ exports.atualizarAgendamentos = functions.https.onRequest(async (req, res) => {
       }
 
       // Notificação: começa em 5 minutos
-      if (ag.horaInicio === cincoMinDepois && ag.status === "confirmado" && token) {
+      if (ag.startTime === cincoMinDepois && ag.status === "confirmado" && token) {
         await admin.messaging().send({
           notification: {
             title: "Sua reserva começa em 5 minutos!",
@@ -49,7 +51,7 @@ exports.atualizarAgendamentos = functions.https.onRequest(async (req, res) => {
       }
 
       // Notificação: termina em 5 minutos
-      if (ag.horaFim === cincoMinDepois && ag.status === "em_andamento" && token) {
+      if (ag.endTime === cincoMinDepois && ag.status === "em_andamento" && token) {
         await admin.messaging().send({
           notification: {
             title: "Sua reserva termina em 5 minutos!",
@@ -60,7 +62,7 @@ exports.atualizarAgendamentos = functions.https.onRequest(async (req, res) => {
       }
 
       // Início da reserva
-      if (ag.horaInicio <= horaAtual && ag.horaFim > horaAtual && ag.status !== "em_andamento") {
+      if (ag.startTime <= horaAtual && ag.endTime > horaAtual && ag.status !== "em_andamento") {
         await ref.update({ status: "em_andamento" });
         atualizados++;
 
@@ -76,7 +78,7 @@ exports.atualizarAgendamentos = functions.https.onRequest(async (req, res) => {
       }
 
       // Fim da reserva
-      else if (ag.horaFim <= horaAtual && ag.status !== "finalizado") {
+      else if (ag.endTime <= horaAtual && ag.status !== "finalizado") {
         await ref.update({ status: "finalizado" });
         atualizados++;
 
@@ -92,7 +94,7 @@ exports.atualizarAgendamentos = functions.https.onRequest(async (req, res) => {
       }
     }
 
-    res.status(200).send(`Atualizados ${atualizados} agendamentos.`);
+    res.status(200).send(`Atualizados ${atualizados} reservations.`);
   } catch (err) {
     console.error("Erro ao atualizar agendamentos:", err);
     res.status(500).send("Erro interno: " + err.message);

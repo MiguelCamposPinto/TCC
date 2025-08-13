@@ -1,5 +1,6 @@
 package com.example.tcc.view.auth;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,7 +17,7 @@ import android.widget.Toast;
 public class LoginActivity extends AppCompatActivity implements LoginCallback {
 
     private EditText emailInput, passwordInput;
-    private Button loginButton;
+    private Button loginButton, buttonGoToRegistry;
     private AuthService authService;
 
     @Override
@@ -27,6 +28,7 @@ public class LoginActivity extends AppCompatActivity implements LoginCallback {
         emailInput = findViewById(R.id.editTextEmail);
         passwordInput = findViewById(R.id.editTextSenha);
         loginButton = findViewById(R.id.buttonLogin);
+        buttonGoToRegistry = findViewById(R.id.buttonGoToRegistry);
 
         authService = new AuthService();
 
@@ -41,6 +43,7 @@ public class LoginActivity extends AppCompatActivity implements LoginCallback {
                 authService.loginUser(email, password, LoginActivity.this,this);
             }
         });
+        buttonGoToRegistry.setOnClickListener(view -> startActivity(new Intent(this, RegisterActivity.class)));
     }
 
     @Override

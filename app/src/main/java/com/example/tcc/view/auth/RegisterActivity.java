@@ -1,6 +1,7 @@
 package com.example.tcc.view.auth;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -17,7 +18,7 @@ public class RegisterActivity extends AppCompatActivity {
 
     private EditText editTextEmail, editTextSenha, editTextNome;
     private RadioGroup radioGroupTipo;
-    private Button buttonCadastrar;
+    private Button buttonCadastrar, buttonGoToLogin;
     private AuthService authService;
 
     @Override
@@ -30,6 +31,7 @@ public class RegisterActivity extends AppCompatActivity {
         editTextNome = findViewById(R.id.editTextNome);
         buttonCadastrar = findViewById(R.id.buttonCadastrar);
         radioGroupTipo = findViewById(R.id.radioGroupTipo);
+        buttonGoToLogin = findViewById(R.id.buttonGoToLogin);
 
         authService = new AuthService();
 
@@ -46,5 +48,6 @@ public class RegisterActivity extends AppCompatActivity {
                 authService.registerUser(email, name, password, userType, RegisterActivity.this);
             }
         });
+        buttonGoToLogin.setOnClickListener(view -> startActivity(new Intent(this, LoginActivity.class)));
     }
 }

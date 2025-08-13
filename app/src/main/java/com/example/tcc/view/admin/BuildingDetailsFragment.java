@@ -84,7 +84,7 @@ public class BuildingDetailsFragment extends Fragment {
     }
 
     private void loadSpaces() {
-        ListenerRegistration reg = db.collection("predios")
+        ListenerRegistration reg = db.collection("buildings")
                 .document(buildingId)
                 .collection("spaces")
                 .addSnapshotListener((snapshot, error) -> {
@@ -115,7 +115,7 @@ public class BuildingDetailsFragment extends Fragment {
     }
 
     private void loadBuildingDetails() {
-        DocumentReference buildingRef = db.collection("predios").document(buildingId);
+        DocumentReference buildingRef = db.collection("buildings").document(buildingId);
         buildingRef.get().addOnSuccessListener(documentSnapshot -> {
             if (documentSnapshot.exists()) {
                 String name = documentSnapshot.getString("name");

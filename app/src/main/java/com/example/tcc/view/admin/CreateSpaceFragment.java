@@ -63,7 +63,7 @@ public class CreateSpaceFragment extends Fragment {
         spaceData.put("name", name);
         spaceData.put("buildingId", buildingId);
 
-        db.collection("predios")
+        db.collection("buildings")
                 .document(buildingId)
                 .collection("spaces")
                 .add(spaceData)

@@ -62,11 +62,11 @@ public class CreateBuildingFragment extends Fragment {
         buildingData.put("address", address);
         buildingData.put("adminId", adminId);
 
-        db.collection("predios").add(buildingData).addOnSuccessListener(documentReference -> {
+        db.collection("buildings").add(buildingData).addOnSuccessListener(documentReference -> {
             String buildingId = documentReference.getId();
 
             DocumentReference userRef = db.collection("users").document(adminId);
-            userRef.update("predios", FieldValue.arrayUnion(buildingId))
+            userRef.update("buildings", FieldValue.arrayUnion(buildingId))
                     .addOnSuccessListener(unused -> {
                         Toast.makeText(getContext(), "Prédio criado!", Toast.LENGTH_SHORT).show();
                         nameInput.setText("");

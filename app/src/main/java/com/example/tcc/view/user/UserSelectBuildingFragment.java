@@ -47,7 +47,7 @@ public class UserSelectBuildingFragment extends Fragment {
         adapter = new UserBuildingAdapter(buildingList, building -> {
             String userId = auth.getCurrentUser().getUid();
             db.collection("users").document(userId)
-                    .update("predioID", building.getId())
+                    .update("buildingId", building.getId())
                     .addOnSuccessListener(unused -> {
                         Toast.makeText(getContext(), "Prédio associado com sucesso!", Toast.LENGTH_SHORT).show();
                         requireActivity().getSupportFragmentManager().popBackStack();
@@ -63,7 +63,7 @@ public class UserSelectBuildingFragment extends Fragment {
     }
 
     private void loadBuildings() {
-        ListenerRegistration reg = db.collection("predios")
+        ListenerRegistration reg = db.collection("buildings")
                 .addSnapshotListener((snapshot, error) -> {
                     if (error != null || snapshot == null) {
                         Toast.makeText(getContext(), "Erro ao escutar prédios", Toast.LENGTH_SHORT).show();

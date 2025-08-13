@@ -87,9 +87,9 @@ public class CreateMachineFragment extends Fragment {
         String type = spinnerMachineType.getSelectedItem().toString();
 
         if (type.equals("Máquina de lavar")) {
-            type = "lavar";
+            type = "wash";
         } else if (type.equals("Máquina de secar")) {
-            type = "secar";
+            type = "dry";
         }
 
         if (name.isEmpty()) {
@@ -103,7 +103,7 @@ public class CreateMachineFragment extends Fragment {
         machineData.put("buildingId", buildingId);
         machineData.put("spaceId", spaceId);
 
-        if (type.equals("lavar")) {
+        if (type.equals("wash")) {
             List<Map<String, Object>> ciclos = new ArrayList<>();
             for (View view : cycleViews) {
                 EditText nomeInput = view.findViewById(R.id.editCycleName);
@@ -116,8 +116,8 @@ public class CreateMachineFragment extends Fragment {
                     try {
                         int duracao = Integer.parseInt(duracaoStr);
                         Map<String, Object> ciclo = new HashMap<>();
-                        ciclo.put("nome", nome);
-                        ciclo.put("duracao", duracao);
+                        ciclo.put("name", nome);
+                        ciclo.put("duration", duracao);
                         ciclos.add(ciclo);
                     } catch (NumberFormatException e) {
                         Toast.makeText(getContext(), "Duração inválida para ciclo: " + nome, Toast.LENGTH_SHORT).show();
@@ -128,19 +128,19 @@ public class CreateMachineFragment extends Fragment {
 
             if (ciclos.isEmpty()) {
                 Map<String, Object> cicloPadrao = new HashMap<>();
-                cicloPadrao.put("nome", "Normal");
-                cicloPadrao.put("duracao", 60);
+                cicloPadrao.put("name", "Normal");
+                cicloPadrao.put("duration", 60);
                 ciclos.add(cicloPadrao);
             }
 
-            machineData.put("ciclos", ciclos);
+            machineData.put("cycles", ciclos);
         }
 
-        db.collection("predios")
+        db.collection("buildings")
                 .document(buildingId)
                 .collection("spaces")
                 .document(spaceId)
-                .collection("maquinas")
+                .collection("machines")
                 .add(machineData)
                 .addOnSuccessListener(docRef -> {
                     Toast.makeText(getContext(), "Máquina criada com sucesso!", Toast.LENGTH_SHORT).show();

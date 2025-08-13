@@ -32,6 +32,9 @@
         <action
             android:id="@+id/action_buildingDetailsFragment_to_createSpaceFragment"
             app:destination="@id/createSpaceFragment" />
+        <action
+            android:id="@+id/action_buildingDetailsFragment_to_adminDashboardFragment"
+            app:destination="@id/adminDashboardFragment" />
     </fragment>
     <fragment
         android:id="@+id/spacesListFragment"
@@ -49,4 +52,8 @@
         android:id="@+id/createMachineFragment"
         android:name="com.example.tcc.view.admin.CreateMachineFragment"
         android:label="CreateMachineFragment" />
+    <fragment
+        android:id="@+id/adminDashboardFragment"
+        android:name="com.example.tcc.view.admin.AdminDashboardFragment"
+        android:label="AdminDashboardFragment" />
 </navigation>

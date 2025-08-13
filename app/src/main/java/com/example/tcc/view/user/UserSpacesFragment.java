@@ -71,7 +71,7 @@ public class UserSpacesFragment extends Fragment {
     }
 
     private void loadSpaces() {
-        ListenerRegistration reg = db.collection("predios")
+        ListenerRegistration reg = db.collection("buildings")
                 .document(buildingId)
                 .collection("spaces")
                 .addSnapshotListener((snapshot, error) -> {

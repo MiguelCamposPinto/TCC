@@ -52,5 +52,15 @@
             android:textColor="#FFFFFF"
             android:textStyle="bold"
             android:paddingVertical="12dp" />
+
+        <Button
+            android:id="@+id/buttonGoToRegistry"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Fazer Cadastro"
+            android:backgroundTint="#2196F3"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:paddingVertical="12dp" />
     </LinearLayout>
 </ScrollView>

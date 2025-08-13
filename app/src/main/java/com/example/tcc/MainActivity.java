@@ -40,7 +40,6 @@ public class MainActivity extends AppCompatActivity {
                     .addOnSuccessListener(documentSnapshot -> {
                         if (documentSnapshot.exists()) {
                             String tipo = documentSnapshot.getString("type");
-
                             if ("admin".equals(tipo)) {
                                 startActivity(new Intent(this, AdminMainActivity.class));
                             } else {

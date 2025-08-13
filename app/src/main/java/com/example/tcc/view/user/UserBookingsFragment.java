@@ -1,6 +1,7 @@
 package com.example.tcc.view.user;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,7 +58,7 @@ public class UserBookingsFragment extends Fragment {
     private void carregarReservas() {
         String userId = auth.getCurrentUser().getUid();
 
-        listener = db.collectionGroup("agendamentos")
+        listener = db.collectionGroup("reservations")
                 .whereEqualTo("userId", userId)
                 .addSnapshotListener((querySnapshot, error) -> {
                     if (error != null) {
@@ -77,8 +78,8 @@ public class UserBookingsFragment extends Fragment {
                     }
 
                     reservas.sort((a1, a2) -> {
-                        String d1 = a1.getData() + " " + a1.getHoraInicio();
-                        String d2 = a2.getData() + " " + a2.getHoraInicio();
+                        String d1 = a1.getDate() + " " + a1.getStartTime();
+                        String d2 = a2.getDate() + " " + a2.getStartTime();
                         return d2.compareTo(d1);
                     });
 

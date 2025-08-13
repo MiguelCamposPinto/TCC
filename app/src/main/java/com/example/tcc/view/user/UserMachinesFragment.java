@@ -74,11 +74,11 @@ public class UserMachinesFragment extends Fragment {
     }
 
     private void loadMachines() {
-        ListenerRegistration reg = db.collection("predios")
+        ListenerRegistration reg = db.collection("buildings")
                 .document(buildingId)
                 .collection("spaces")
                 .document(spaceId)
-                .collection("maquinas")
+                .collection("machines")
                 .addSnapshotListener((snapshot, error) -> {
                     if (error != null) {
                         Toast.makeText(getContext(), "Erro ao escutar máquinas", Toast.LENGTH_SHORT).show();
@@ -99,13 +99,13 @@ public class UserMachinesFragment extends Fragment {
     }
 
     private void verificarStatusMaquinaEmTempoReal(Machine machine) {
-        ListenerRegistration reg = db.collection("predios")
+        ListenerRegistration reg = db.collection("buildings")
                 .document(buildingId)
                 .collection("spaces")
                 .document(spaceId)
-                .collection("maquinas")
+                .collection("machines")
                 .document(machine.getId())
-                .collection("agendamentos")
+                .collection("reservations")
                 .whereEqualTo("status", "em_andamento")
                 .addSnapshotListener((snapshot, error) -> {
                     if (error != null) return;

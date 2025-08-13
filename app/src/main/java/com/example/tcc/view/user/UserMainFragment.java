@@ -58,15 +58,15 @@ public class UserMainFragment extends Fragment {
     private void loadUserBuilding() {
         String uid = auth.getCurrentUser().getUid();
         db.collection("users").document(uid).get().addOnSuccessListener(snapshot -> {
-            if (snapshot.exists() && snapshot.contains("predioID")) {
-                String predioID = snapshot.getString("predioID");
-                if (predioID != null && !predioID.isEmpty()) {
-                    db.collection("predios").document(predioID).get().addOnSuccessListener(doc -> {
+            if (snapshot.exists() && snapshot.contains("buildingId")) {
+                String buildingId = snapshot.getString("buildingId");
+                if (buildingId != null && !buildingId.isEmpty()) {
+                    db.collection("buildings").document(buildingId).get().addOnSuccessListener(doc -> {
                         if (doc.exists()) {
                             String name = doc.getString("name");
                             String address = doc.getString("address");
                             textInfo.setText("Você está associado ao prédio:\n" + name + "\n" + address);
-                            currentBuildingId = predioID;
+                            currentBuildingId = buildingId;
                             btnEnter.setVisibility(View.VISIBLE);
                         }
                     });

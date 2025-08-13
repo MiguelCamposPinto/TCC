@@ -54,7 +54,7 @@ public class AdminMainFragment extends Fragment {
     private void loadAdminBuildings() {
         String currentAdminId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        db.collection("predios")
+        db.collection("buildings")
                 .whereEqualTo("adminId", currentAdminId)
                 .get()
                 .addOnSuccessListener(querySnapshot -> {

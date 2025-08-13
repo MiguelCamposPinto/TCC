@@ -27,9 +27,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -78,27 +76,27 @@ public class UserScheduleMachineFragment extends Fragment {
 
         spinnerCiclo = view.findViewById(R.id.spinnerCiclo);
 
-        db.collection("predios")
+        db.collection("buildings")
                 .document(buildingId)
                 .collection("spaces")
                 .document(spaceId)
-                .collection("maquinas")
+                .collection("machines")
                 .document(machineId)
                 .get()
                 .addOnSuccessListener(doc -> {
                     String tipo = doc.getString("type");
-                    if ("lavar".equalsIgnoreCase(tipo)) {
+                    if ("wash".equalsIgnoreCase(tipo)) {
                         spinnerCiclo.setVisibility(View.VISIBLE);
 
                         List<String> nomesCiclos = new ArrayList<>();
                         List<Integer> duracoesCiclos = new ArrayList<>();
 
-                        List<Map<String, Object>> ciclos = (List<Map<String, Object>>) doc.get("ciclos");
+                        List<Map<String, Object>> ciclos = (List<Map<String, Object>>) doc.get("cycles");
 
                         if (ciclos != null && !ciclos.isEmpty()) {
                             for (Map<String, Object> ciclo : ciclos) {
-                                String nome = (String) ciclo.get("nome");
-                                Long dur = (Long) ciclo.get("duracao");
+                                String nome = (String) ciclo.get("name");
+                                Long dur = (Long) ciclo.get("duration");
                                 if (nome != null && dur != null) {
                                     nomesCiclos.add(nome + " (" + dur + " min)");
                                     duracoesCiclos.add(dur.intValue());
@@ -116,6 +114,7 @@ public class UserScheduleMachineFragment extends Fragment {
                                 android.R.layout.simple_spinner_item,
                                 nomesCiclos
                         );
+
                         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                         spinnerCiclo.setAdapter(adapter);
 
@@ -137,9 +136,9 @@ public class UserScheduleMachineFragment extends Fragment {
     private void showDatePicker() {
         Calendar c = Calendar.getInstance();
         DatePickerDialog dialog = new DatePickerDialog(getContext(), (view, year, month, dayOfMonth) -> {
-            @SuppressLint("DefaultLocale") String data = String.format("%04d-%02d-%02d", year, month + 1, dayOfMonth);
-            textSelectedDate.setText(data);
-            carregarHorariosDisponiveis(data);
+            @SuppressLint("DefaultLocale") String date = String.format("%04d-%02d-%02d", year, month + 1, dayOfMonth);
+            textSelectedDate.setText(date);
+            carregarHorariosDisponiveis(date);
         }, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH));
 
         dialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
@@ -164,22 +163,22 @@ public class UserScheduleMachineFragment extends Fragment {
         List<String> todosSlots = gerarSlotsDiarios(duracaoMinutos);
         List<String> disponiveis = new ArrayList<>(todosSlots);
 
-        db.collection("predios")
+        db.collection("buildings")
                 .document(buildingId)
                 .collection("spaces")
                 .document(spaceId)
-                .collection("maquinas")
+                .collection("machines")
                 .document(machineId)
-                .collection("agendamentos")
-                .whereEqualTo("data", dataSelecionada)
+                .collection("reservations")
+                .whereEqualTo("date", dataSelecionada)
                 .get()
                 .addOnSuccessListener(snapshot -> {
                     for (DocumentSnapshot doc : snapshot.getDocuments()) {
                         String status = doc.getString("status");
                         if (!"confirmado".equals(status) && !"em_andamento".equals(status)) continue;
 
-                        String ini = doc.getString("horaInicio");
-                        String fim = doc.getString("horaFim");
+                        String ini = doc.getString("startTime");
+                        String fim = doc.getString("endTime");
 
                         List<String> remover = new ArrayList<>();
                         for (String slot : disponiveis) {
@@ -235,44 +234,48 @@ public class UserScheduleMachineFragment extends Fragment {
         return slots;
     }
 
-    private void fazerAgendamento(String data, String horaInicio) {
+    private void fazerAgendamento(String date, String startTime) {
         String userId = auth.getCurrentUser().getUid();
 
-        int duracaoMinutos = 60;
+        int durationMin;
         if (spinnerCiclo.getTag() instanceof List) {
             List<Integer> duracoes = (List<Integer>) spinnerCiclo.getTag();
             int pos = spinnerCiclo.getSelectedItemPosition();
             if (pos >= 0 && pos < duracoes.size()) {
-                duracaoMinutos = duracoes.get(pos);
+                durationMin = duracoes.get(pos);
+            } else {
+                durationMin = 60;
             }
+        } else {
+            durationMin = 60;
         }
 
-        String horaFim = calcularHoraFim(horaInicio, duracaoMinutos);
+        String endTime = calcularHoraFim(startTime, durationMin);
 
-        db.collection("predios")
+        db.collection("buildings")
                 .document(buildingId)
                 .collection("spaces")
                 .document(spaceId)
-                .collection("maquinas")
+                .collection("machines")
                 .document(machineId)
-                .collection("agendamentos")
-                .whereEqualTo("data", data)
+                .collection("reservations")
+                .whereEqualTo("date", date)
                 .get()
                 .addOnSuccessListener(snapshot -> {
                     for (DocumentSnapshot doc : snapshot.getDocuments()) {
                         String status = doc.getString("status");
-                        String inicio = doc.getString("horaInicio");
-                        String fim = doc.getString("horaFim");
+                        String inicio = doc.getString("startTime");
+                        String fim = doc.getString("endTime");
 
                         if ("confirmado".equals(status) || "em_andamento".equals(status)) {
-                            if (conflita(horaInicio, horaFim, inicio, fim)) {
+                            if (conflita(startTime, endTime, inicio, fim)) {
                                 Toast.makeText(getContext(), "Horário em conflito com outro agendamento.", Toast.LENGTH_SHORT).show();
                                 return;
                             }
                         }
                     }
 
-                    salvarAgendamento(userId, data, horaInicio, horaFim);
+                    salvarAgendamento(userId, date, startTime, endTime,durationMin);
                 });
     }
 
@@ -290,34 +293,37 @@ public class UserScheduleMachineFragment extends Fragment {
         return String.format("%04d-%02d-%02d", c.get(Calendar.YEAR), c.get(Calendar.MONTH) + 1, c.get(Calendar.DAY_OF_MONTH));
     }
 
-    private void salvarAgendamento(String userId, String data, String horaInicio, String horaFim) {
+    private void salvarAgendamento(String userId, String date, String startTime, String endTime, int durationMin) {
         db.collection("users").document(userId).get().addOnSuccessListener(userDoc -> {
             String userName = userDoc.getString("name");
 
-            db.collection("predios").document(buildingId)
+            db.collection("buildings").document(buildingId)
                     .collection("spaces").document(spaceId)
                     .get().addOnSuccessListener(spaceDoc -> {
                         String espacoNome = spaceDoc.getString("name");
 
-                        db.collection("predios").document(buildingId)
+                        db.collection("buildings").document(buildingId)
                                 .collection("spaces").document(spaceId)
-                                .collection("maquinas").document(machineId)
+                                .collection("machines").document(machineId)
                                 .get().addOnSuccessListener(machineDoc -> {
                                     String machineName = machineDoc.getString("name");
 
-                                    Agendamento ag = new Agendamento(userId, data, horaInicio, horaFim, "confirmado");
+                                    Agendamento ag = new Agendamento(userId, date, startTime, endTime, "confirmado", durationMin);
                                     ag.setUserName(userName);
-                                    ag.setEspacoNome(espacoNome);
+                                    ag.setSpaceName(espacoNome);
                                     ag.setMachineName(machineName);
+                                    ag.setBuildingID(buildingId);
+                                    ag.setSpaceId(spaceId);
+                                    ag.setMachineId(machineId);
 
-                                    db.collection("predios").document(buildingId)
+                                    db.collection("buildings").document(buildingId)
                                             .collection("spaces").document(spaceId)
-                                            .collection("maquinas").document(machineId)
-                                            .collection("agendamentos")
+                                            .collection("machines").document(machineId)
+                                            .collection("reservations")
                                             .add(ag)
                                             .addOnSuccessListener(r -> {
                                                 Toast.makeText(requireContext(),
-                                                        "Agendado de " + horaInicio + " às " + horaFim,
+                                                        "Agendado de " + startTime + " às " + endTime,
                                                         Toast.LENGTH_SHORT).show();
                                                 requireActivity().getSupportFragmentManager().popBackStack();
                                             })
@@ -330,9 +336,9 @@ public class UserScheduleMachineFragment extends Fragment {
     }
 
 
-    private String calcularHoraFim(String horaInicio, int durMin) {
+    private String calcularHoraFim(String startTime, int durMin) {
         try {
-            String[] p = horaInicio.split(":");
+            String[] p = startTime.split(":");
             int h = Integer.parseInt(p[0]);
             int m = Integer.parseInt(p[1]) + durMin;
             h += m / 60;

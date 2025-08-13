@@ -3,23 +3,28 @@ package com.example.tcc.model;
 public class Agendamento {
     private String userId;
     private String userName;
-    private String data;
-    private String horaInicio;
-    private String horaFim;
+    private String date;
+    private String startTime;
+    private String endTime;
     private String status;
     private String firestorePath;
-    private String espacoNome;
+    private String spaceName;
     private String machineName;
+    private String buildingId;
+    private String spaceId;
+    private String machineId;
+    private int durationMin;
 
     public Agendamento() {
     }
 
-    public Agendamento(String userId, String data, String horaInicio, String horaFim, String status) {
+    public Agendamento(String userId, String date, String startTime, String endTime, String status, int durationMin) {
         this.userId = userId;
-        this.data = data;
-        this.horaInicio = horaInicio;
-        this.horaFim = horaFim;
+        this.date = date;
+        this.startTime = startTime;
+        this.endTime = endTime;
         this.status = status;
+        this.durationMin = durationMin;
     }
 
     public String getUserId() {
@@ -30,16 +35,16 @@ public class Agendamento {
         return userName;
     }
 
-    public String getData() {
-        return data;
+    public String getDate() {
+        return date;
     }
 
-    public String getHoraInicio() {
-        return horaInicio;
+    public String getStartTime() {
+        return startTime;
     }
 
-    public String getHoraFim() {
-        return horaFim;
+    public String getEndTime() {
+        return endTime;
     }
 
     public String getStatus() {
@@ -50,8 +55,8 @@ public class Agendamento {
         return firestorePath;
     }
 
-    public String getEspacoNome() {
-        return espacoNome;
+    public String getSpaceName() {
+        return spaceName;
     }
 
     public String getMachineName() {
@@ -68,15 +73,15 @@ public class Agendamento {
     }
 
     public void setData(String data) {
-        this.data = data;
+        this.date = data;
     }
 
-    public void setHoraInicio(String horaInicio) {
-        this.horaInicio = horaInicio;
+    public void setStartTime(String startTime) {
+        this.startTime = startTime;
     }
 
-    public void setHoraFim(String horaFim) {
-        this.horaFim = horaFim;
+    public void setEndTime(String endTime) {
+        this.endTime = endTime;
     }
 
     public void setStatus(String status) {
@@ -87,11 +92,43 @@ public class Agendamento {
         this.firestorePath = firestorePath;
     }
 
-    public void setEspacoNome(String espacoNome) {
-        this.espacoNome = espacoNome;
+    public void setSpaceName(String spaceName) {
+        this.spaceName = spaceName;
     }
 
     public void setMachineName(String machineName) {
         this.machineName = machineName;
+    }
+
+    public int getDurationMin() {
+        return durationMin;
+    }
+
+    public void setDurationMin(int durationMin) {
+        this.durationMin = durationMin;
+    }
+
+    public String getBuildingID() {
+        return buildingId;
+    }
+
+    public void setBuildingID(String buildingId) {
+        this.buildingId = buildingId;
+    }
+
+    public String getSpaceId() {
+        return spaceId;
+    }
+
+    public void setSpaceId(String spaceId) {
+        this.spaceId = spaceId;
+    }
+
+    public String getMachineId() {
+        return machineId;
+    }
+
+    public void setMachineId(String machineId) {
+        this.machineId = machineId;
     }
 }

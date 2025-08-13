@@ -71,13 +71,13 @@ public class AdminAgendamentosFragment extends Fragment {
     }
 
     private void carregarAgendamentos() {
-        ListenerRegistration reg = db.collection("predios")
+        ListenerRegistration reg = db.collection("buildings")
                 .document(buildingId)
                 .collection("spaces")
                 .document(spaceId)
-                .collection("maquinas")
+                .collection("machines")
                 .document(machineId)
-                .collection("agendamentos")
+                .collection("reservations")
                 .addSnapshotListener((snapshot, error) -> {
                     if (error != null) {
                         Toast.makeText(getContext(), "Erro ao escutar agendamentos", Toast.LENGTH_SHORT).show();
@@ -90,7 +90,7 @@ public class AdminAgendamentosFragment extends Fragment {
                             Agendamento agendamento = doc.toObject(Agendamento.class);
                             if (agendamento != null) {
                                 agendamento.setUserName(doc.getString("userName"));
-                                agendamento.setEspacoNome(doc.getString("espacoNome"));
+                                agendamento.setSpaceName(doc.getString("spaceName"));
                                 agendamento.setFirestorePath(doc.getReference().getPath());
                                 agendamentos.add(agendamento);
                             }
