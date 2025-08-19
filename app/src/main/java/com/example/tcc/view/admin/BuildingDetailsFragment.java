@@ -34,7 +34,7 @@ public class BuildingDetailsFragment extends Fragment {
     private FirebaseFirestore db;
     private String buildingId;
     private TextView buildingName, buildingAddress;
-    private Button addSpaceButton;
+    private Button addSpaceButton, buttonViewResidents;
     private RecyclerView recyclerSpaces;
     private final List<Spaces> spaceList = new ArrayList<>();
     private SpacesAdapter spacesAdapter;
@@ -59,6 +59,8 @@ public class BuildingDetailsFragment extends Fragment {
         buildingAddress = view.findViewById(R.id.textBuildingAddress);
         addSpaceButton = view.findViewById(R.id.buttonAddSpace);
         recyclerSpaces = view.findViewById(R.id.recyclerSpaces);
+        buttonViewResidents = view.findViewById(R.id.buttonViewResidents);
+
 
         recyclerSpaces.setLayoutManager(new LinearLayoutManager(getContext()));
         spacesAdapter = new SpacesAdapter(spaceList, space -> {
@@ -76,6 +78,13 @@ public class BuildingDetailsFragment extends Fragment {
             args.putString("buildingId", buildingId);
             navController.navigate(R.id.action_buildingDetailsFragment_to_createSpaceFragment, args);
         });
+
+        buttonViewResidents.setOnClickListener(v -> {
+            Bundle args = new Bundle();
+            args.putString("buildingId", buildingId);
+            Navigation.findNavController(requireView()).navigate(R.id.action_buildingDetailsFragment_to_usersInBuildingFragment, args);
+        });
+
 
         loadBuildingDetails();
         loadSpaces();

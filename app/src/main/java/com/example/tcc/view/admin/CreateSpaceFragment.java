@@ -5,6 +5,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.widget.Spinner;
+import android.widget.ArrayAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +26,7 @@ public class CreateSpaceFragment extends Fragment {
     private Button createSpaceButton;
     private FirebaseFirestore db;
     private String buildingId;
+    private Spinner spinnerSpaceType;
 
 
     @Nullable
@@ -41,6 +44,15 @@ public class CreateSpaceFragment extends Fragment {
             buildingId = getArguments().getString("buildingId");
         }
 
+        spinnerSpaceType = view.findViewById(R.id.spinnerSpaceType);
+
+        String[] spaceTypes = {"lavanderia", "quadra", "salao"};
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(),
+                android.R.layout.simple_spinner_item, spaceTypes);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        spinnerSpaceType.setAdapter(adapter);
+
         createSpaceButton.setOnClickListener(v -> createSpace());
 
         return view;
@@ -48,6 +60,7 @@ public class CreateSpaceFragment extends Fragment {
 
     private void createSpace() {
         String name = spaceNameInput.getText().toString().trim();
+        String type = spinnerSpaceType.getSelectedItem().toString().toLowerCase();
 
         if (name.isEmpty()) {
             Toast.makeText(getContext(), "Preencha todos os campos", Toast.LENGTH_SHORT).show();
@@ -62,6 +75,7 @@ public class CreateSpaceFragment extends Fragment {
         Map<String, Object> spaceData = new HashMap<>();
         spaceData.put("name", name);
         spaceData.put("buildingId", buildingId);
+        spaceData.put("type", type);
 
         db.collection("buildings")
                 .document(buildingId)

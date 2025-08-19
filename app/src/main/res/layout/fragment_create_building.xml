@@ -43,6 +43,16 @@
             android:backgroundTint="?android:textColorPrimary"
             android:textColor="?android:textColorPrimary" />
 
+        <EditText
+            android:id="@+id/editTextBuildingPasswod"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Senha para entrar"
+            android:padding="12dp"
+            android:layout_marginBottom="24dp"
+            android:backgroundTint="?android:textColorPrimary"
+            android:textColor="?android:textColorPrimary" />
+
         <Button
             android:id="@+id/buttonCreateBuilding"
             android:layout_width="match_parent"

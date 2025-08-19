@@ -38,6 +38,7 @@ public class SpacesAdapter extends RecyclerView.Adapter<SpacesAdapter.ViewHolder
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Spaces space = spaceList.get(position);
         holder.name.setText(space.getName());
+        holder.type.setText(space.getType());
         holder.itemView.setOnClickListener(v -> listener.onClick(space));
     }
 
@@ -47,11 +48,13 @@ public class SpacesAdapter extends RecyclerView.Adapter<SpacesAdapter.ViewHolder
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView name;
+        TextView name, type;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
             name = itemView.findViewById(android.R.id.text1);
+            type = itemView.findViewById(android.R.id.text2);
+
         }
     }
 }

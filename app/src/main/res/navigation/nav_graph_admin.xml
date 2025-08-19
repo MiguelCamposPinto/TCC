@@ -35,6 +35,9 @@
         <action
             android:id="@+id/action_buildingDetailsFragment_to_adminDashboardFragment"
             app:destination="@id/adminDashboardFragment" />
+        <action
+            android:id="@+id/action_buildingDetailsFragment_to_usersInBuildingFragment"
+            app:destination="@id/usersInBuildingFragment" />
     </fragment>
     <fragment
         android:id="@+id/spacesListFragment"
@@ -56,4 +59,8 @@
         android:id="@+id/adminDashboardFragment"
         android:name="com.example.tcc.view.admin.AdminDashboardFragment"
         android:label="AdminDashboardFragment" />
+    <fragment
+        android:id="@+id/usersInBuildingFragment"
+        android:name="com.example.tcc.view.admin.UsersInBuildingFragment"
+        android:label="UsersInBuildingFragment" />
 </navigation>

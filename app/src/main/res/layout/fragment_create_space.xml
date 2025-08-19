@@ -20,6 +20,14 @@
             android:textColor="?android:textColorPrimary"
             android:layout_marginBottom="32dp" />
 
+        <Spinner
+            android:id="@+id/spinnerSpaceType"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:backgroundTint="?android:textColorPrimary" />
+
+
         <EditText
             android:id="@+id/editTextSpaceName"
             android:layout_width="match_parent"

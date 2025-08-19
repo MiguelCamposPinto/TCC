@@ -14,6 +14,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.tcc.R;
+import com.example.tcc.model.Building;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
@@ -23,7 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class CreateBuildingFragment extends Fragment {
-    private EditText nameInput, addressInput;
+    private EditText nameInput, addressInput, passwordInput;
     private Button createButton;
     private FirebaseAuth auth;
     private FirebaseFirestore db;
@@ -37,9 +38,10 @@ public class CreateBuildingFragment extends Fragment {
         nameInput = view.findViewById(R.id.editTextBuildingName);
         addressInput = view.findViewById(R.id.editTextBuildingAddress);
         createButton = view.findViewById(R.id.buttonCreateBuilding);
+        passwordInput = view.findViewById(R.id.editTextBuildingPasswod);
 
-        auth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
+        auth = FirebaseAuth.getInstance();
 
         createButton.setOnClickListener(v -> createBuilding());
 
@@ -49,32 +51,32 @@ public class CreateBuildingFragment extends Fragment {
     private void createBuilding() {
         String name = nameInput.getText().toString().trim();
         String address = addressInput.getText().toString().trim();
+        String buildingPassword = passwordInput.getText().toString().trim();
 
-        if (name.isEmpty() || address.isEmpty()) {
+        if (name.isEmpty() || address.isEmpty() || buildingPassword.isEmpty()) {
             Toast.makeText(getContext(), "Preencha todos os campos", Toast.LENGTH_SHORT).show();
             return;
         }
 
         String adminId = auth.getCurrentUser().getUid();
+        Building building = new Building(name, address, buildingPassword, adminId);
 
-        Map<String, Object> buildingData = new HashMap<>();
-        buildingData.put("name", name);
-        buildingData.put("address", address);
-        buildingData.put("adminId", adminId);
+        db.collection("buildings")
+                .add(building.toMap())
+                .addOnSuccessListener(documentReference -> {
+                    String buildingId = documentReference.getId();
 
-        db.collection("buildings").add(buildingData).addOnSuccessListener(documentReference -> {
-            String buildingId = documentReference.getId();
+                    db.collection("users").document(adminId)
+                            .update("buildings", FieldValue.arrayUnion(buildingId))
+                            .addOnSuccessListener(unused -> {
+                                Toast.makeText(getContext(), "Prédio criado!", Toast.LENGTH_SHORT).show();
+                                nameInput.setText("");
+                                addressInput.setText("");
+                                passwordInput.setText("");
+                            });
 
-            DocumentReference userRef = db.collection("users").document(adminId);
-            userRef.update("buildings", FieldValue.arrayUnion(buildingId))
-                    .addOnSuccessListener(unused -> {
-                        Toast.makeText(getContext(), "Prédio criado!", Toast.LENGTH_SHORT).show();
-                        nameInput.setText("");
-                        addressInput.setText("");
-                    });
-
-        }).addOnFailureListener(e -> {
-            Toast.makeText(getContext(), "Erro ao criar prédio: " + e.getMessage(), Toast.LENGTH_LONG).show();
-        });
+                }).addOnFailureListener(e -> {
+                    Toast.makeText(getContext(), "Erro ao criar prédio: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                });
     }
 }

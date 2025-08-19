@@ -1,6 +1,7 @@
 package com.example.tcc.model;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.widget.Toast;
 
@@ -26,27 +27,30 @@ public class AuthService {
     }
 
     public void registerUser(String email, String name, String password, String userType, Activity activity) {
-        auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                FirebaseUser user = auth.getCurrentUser();
-                Map<String, Object> data = new HashMap<>();
-                data.put("name", name);
-                if (user != null) {
-                    data.put("email", user.getEmail());
-                }
-                data.put("type", userType);
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-                if (user != null) {
-                    db.collection("users").document(user.getUid()).set(data).addOnSuccessListener(unused -> {
-                        Toast.makeText(activity, "Cadastro realizado com sucesso!", Toast.LENGTH_SHORT).show();
-                        redirectUser(activity, userType);
-                    });
-                }
-            } else {
-                Toast.makeText(activity, "Erro: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
-            }
-        });
+        mAuth.createUserWithEmailAndPassword(email, password)
+                .addOnSuccessListener(authResult -> {
+                    String uid = authResult.getUser().getUid();
+
+                    User user = new User(uid, name, email, "", userType); // buildingId vazio
+
+                    db.collection("users")
+                            .document(uid)
+                            .set(user)
+                            .addOnSuccessListener(aVoid -> {
+                                Toast.makeText(activity, "Cadastro realizado com sucesso", Toast.LENGTH_SHORT).show();
+                                Intent intent = new Intent(activity, LoginActivity.class);
+                                redirectUser(activity, userType);
+                            })
+                            .addOnFailureListener(e ->
+                                    Toast.makeText(activity, "Erro ao salvar dados: " + e.getMessage(), Toast.LENGTH_LONG).show());
+                })
+                .addOnFailureListener(e ->
+                        Toast.makeText(activity, "Erro ao registrar: " + e.getMessage(), Toast.LENGTH_LONG).show());
     }
+
 
 
     public void loginUser(String email, String password, Activity activity, LoginCallback callback) {

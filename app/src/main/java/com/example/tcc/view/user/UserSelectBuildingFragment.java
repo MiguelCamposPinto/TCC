@@ -1,9 +1,12 @@
 package com.example.tcc.view.user;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -45,15 +48,7 @@ public class UserSelectBuildingFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         adapter = new UserBuildingAdapter(buildingList, building -> {
-            String userId = auth.getCurrentUser().getUid();
-            db.collection("users").document(userId)
-                    .update("buildingId", building.getId())
-                    .addOnSuccessListener(unused -> {
-                        Toast.makeText(getContext(), "Prédio associado com sucesso!", Toast.LENGTH_SHORT).show();
-                        requireActivity().getSupportFragmentManager().popBackStack();
-                    })
-                    .addOnFailureListener(e ->
-                            Toast.makeText(getContext(), "Erro ao associar prédio", Toast.LENGTH_SHORT).show());
+            abrirDialogSenha(building.getId());
         });
 
         recyclerView.setAdapter(adapter);
@@ -90,6 +85,54 @@ public class UserSelectBuildingFragment extends Fragment {
 
         listeners.add(reg);
     }
+
+    private void abrirDialogSenha(String buildingId) {
+        LayoutInflater inflater = LayoutInflater.from(getContext());
+        View dialogView = inflater.inflate(R.layout.dialog_enter_password, null);
+
+        EditText editSenha = dialogView.findViewById(R.id.editSenha);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setView(dialogView);
+        builder.setCancelable(false);
+
+        final AlertDialog dialog = builder.create();
+        dialog.show();
+
+        Button buttonConfirmar = dialogView.findViewById(R.id.buttonConfirmarSenha);
+        Button buttonCancelar = dialogView.findViewById(R.id.buttonCancelarSenha);
+
+        final int[] tentativas = {0};
+
+        buttonConfirmar.setOnClickListener(v -> {
+            String senhaDigitada = editSenha.getText().toString();
+            db.collection("buildings").document(buildingId).get().addOnSuccessListener(doc -> {
+                String senhaCorreta = doc.getString("password");
+
+                if (senhaDigitada.equals(senhaCorreta)) {
+                    String userId = auth.getCurrentUser().getUid();
+                    db.collection("users").document(userId)
+                            .update("buildingId", buildingId)
+                            .addOnSuccessListener(unused -> {
+                                Toast.makeText(getContext(), "Prédio associado com sucesso!", Toast.LENGTH_SHORT).show();
+                                dialog.dismiss();
+                                requireActivity().getSupportFragmentManager().popBackStack();
+                            })
+                            .addOnFailureListener(e -> Toast.makeText(getContext(), "Erro ao associar prédio", Toast.LENGTH_SHORT).show());
+                } else {
+                    tentativas[0]++;
+                    if (tentativas[0] >= 3) {
+                        Toast.makeText(getContext(), "Número de tentativas excedido", Toast.LENGTH_SHORT).show();
+                        dialog.dismiss();
+                    } else {
+                        Toast.makeText(getContext(), "Senha incorreta. Tentativa " + tentativas[0] + "/3", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+        });
+
+        buttonCancelar.setOnClickListener(v -> dialog.dismiss());
+    }
+
 
     @Override
     public void onDestroyView() {
