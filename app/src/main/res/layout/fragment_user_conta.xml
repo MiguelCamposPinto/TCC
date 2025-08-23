@@ -1,28 +1,58 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
-    android:gravity="center"
     android:padding="24dp"
-    android:background="?android:windowBackground">
+    android:orientation="vertical">
 
-    <TextView
+    <ImageView
+        android:id="@+id/imageProfile"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:src="@drawable/default_user"
+        android:layout_gravity="center_horizontal"
+        android:scaleType="centerCrop"
+        android:layout_marginBottom="16dp"/>
+
+    <Button
+        android:id="@+id/buttonChangePhoto"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Deseja sair da sua conta?"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:textColor="?android:textColorPrimary"
-        android:layout_marginBottom="24dp" />
+        android:text="Alterar Foto"
+        android:layout_gravity="center_horizontal"
+        android:backgroundTint="#2196F3"
+        android:textColor="#FFFFFF"/>
 
-    <com.google.android.material.button.MaterialButton
+    <TextView android:id="@+id/textEmail" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:text="E-mail" android:layout_marginTop="24dp"/>
+
+    <EditText android:id="@+id/editName" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:hint="Nome" android:layout_marginTop="8dp"/>
+
+    <Button
+        android:id="@+id/buttonSave"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Salvar alterações"
+        android:layout_marginTop="16dp"
+        android:backgroundTint="#2196F3"
+        android:textColor="#FFFFFF"/>
+
+    <Button
         android:id="@+id/btnLogout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Sair"
-        android:textColor="#FFFFFF"
+        android:layout_marginTop="32dp"
         android:backgroundTint="#2196F3"
-        app:cornerRadius="16dp" />
+        android:textColor="#FFFFFF"/>
+
+    <Button
+        android:id="@+id/btnExcluirConta"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Excluir Conta"
+        android:backgroundTint="@android:color/holo_red_dark"
+        android:textColor="@android:color/white"
+        android:layout_marginTop="24dp" />
+
 </LinearLayout>

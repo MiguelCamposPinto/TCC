@@ -6,7 +6,7 @@ import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.tcc.R;
-import com.example.tcc.model.AuthService;
+import com.example.tcc.controller.AuthService;
 
 
 import android.widget.Button;

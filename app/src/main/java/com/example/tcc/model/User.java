@@ -6,6 +6,7 @@ public class User {
     private String email;
     private String buildingId;
     private String type;
+    private String photoUrl;
 
     public User() {
     }
@@ -22,17 +23,13 @@ public class User {
     public String getName() { return name; }
     public String getEmail() { return email; }
     public String getBuildingId() { return buildingId; }
-
     public void setUid(String uid) { this.uid = uid; }
     public void setName(String name) { this.name = name; }
     public void setEmail(String email) { this.email = email; }
     public void setBuildingId(String buildingId) { this.buildingId = buildingId; }
+    public String getType() {return type;}
 
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
+    public void setType(String type) {this.type = type;}
+    public String getPhotoUrl() {return photoUrl;}
+    public void setPhotoUrl(String photoUrl) {this.photoUrl = photoUrl;}
 }

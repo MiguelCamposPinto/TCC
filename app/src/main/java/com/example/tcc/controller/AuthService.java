@@ -1,10 +1,10 @@
-package com.example.tcc.model;
+package com.example.tcc.controller;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.widget.Toast;
 
+import com.example.tcc.model.User;
 import com.example.tcc.view.admin.AdminMainActivity;
 import com.example.tcc.view.auth.LoginActivity;
 import com.example.tcc.view.auth.LoginCallback;
@@ -12,9 +12,6 @@ import com.example.tcc.view.user.UserMainActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class AuthService {
 

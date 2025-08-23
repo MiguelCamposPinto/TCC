@@ -11,7 +11,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.tcc.R;
-import com.example.tcc.model.AuthService;
+import com.example.tcc.controller.AuthService;
 
 
 public class RegisterActivity extends AppCompatActivity {

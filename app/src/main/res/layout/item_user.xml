@@ -5,6 +5,14 @@
     android:orientation="vertical"
     android:padding="12dp">
 
+    <ImageView
+        android:id="@+id/imageViewProfile"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginEnd="12dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/default_user" />
+
     <TextView
         android:id="@+id/textUserName"
         android:layout_width="match_parent"
@@ -22,5 +30,7 @@
         android:id="@+id/buttonRemoveUser"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Remover" />
+        android:text="Remover"
+        android:backgroundTint="#F44336"
+        android:textColor="#FFFFFF"/>
 </LinearLayout>

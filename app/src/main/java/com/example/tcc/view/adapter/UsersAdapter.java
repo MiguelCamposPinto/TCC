@@ -4,12 +4,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.tcc.R;
 import com.example.tcc.model.User;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -38,6 +40,13 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHold
         holder.nameText.setText(user.getName());
         holder.emailText.setText(user.getEmail());
 
+        if (user.getPhotoUrl() != null && !user.getPhotoUrl().isEmpty()) {
+            Glide.with(holder.itemView.getContext())
+                    .load(user.getPhotoUrl())
+                    .placeholder(R.drawable.default_user)
+                    .into(holder.profileImageView);
+        }
+
         holder.removeButton.setOnClickListener(v -> {
             db.collection("users")
                     .document(user.getUid())
@@ -57,12 +66,14 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHold
 
     static class UserViewHolder extends RecyclerView.ViewHolder {
         TextView nameText, emailText;
+        ImageView profileImageView;
         Button removeButton;
 
         public UserViewHolder(@NonNull View itemView) {
             super(itemView);
             nameText = itemView.findViewById(R.id.textUserName);
             emailText = itemView.findViewById(R.id.textUserEmail);
+            profileImageView = itemView.findViewById(R.id.imageViewProfile);
             removeButton = itemView.findViewById(R.id.buttonRemoveUser);
         }
     }
