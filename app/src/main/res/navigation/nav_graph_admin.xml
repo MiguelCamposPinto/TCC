@@ -46,6 +46,12 @@
         <action
             android:id="@+id/action_spacesListFragment_to_createMachineFragment"
             app:destination="@id/createMachineFragment" />
+        <action
+            android:id="@+id/action_spacesListFragment_to_createQuadraFragment"
+            app:destination="@id/createQuadraFragment" />
+        <action
+            android:id="@+id/action_spacesListFragment_to_createSalaoFragment"
+            app:destination="@id/createSalaoFragment" />
     </fragment>
     <fragment
         android:id="@+id/createSpaceFragment"
@@ -63,4 +69,12 @@
         android:id="@+id/usersInBuildingFragment"
         android:name="com.example.tcc.view.admin.UsersInBuildingFragment"
         android:label="UsersInBuildingFragment" />
+    <fragment
+        android:id="@+id/createQuadraFragment"
+        android:name="com.example.tcc.view.admin.CreateQuadraFragment"
+        android:label="CreateQuadraFragment" />
+    <fragment
+        android:id="@+id/createSalaoFragment"
+        android:name="com.example.tcc.view.admin.CreateSalaoFragment"
+        android:label="CreateSalaoFragment" />
 </navigation>

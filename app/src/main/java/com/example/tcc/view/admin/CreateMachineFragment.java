@@ -32,7 +32,7 @@ public class CreateMachineFragment extends Fragment {
     private LinearLayout cycleContainer;
 
     private FirebaseFirestore db;
-    private String buildingId, spaceId;
+    private String buildingId, spaceId, spaceType;
 
     private final List<View> cycleViews = new ArrayList<>();
 
@@ -51,7 +51,8 @@ public class CreateMachineFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
         if (getArguments() != null) {
             buildingId = getArguments().getString("buildingId");
-            spaceId    = getArguments().getString("spaceId");
+            spaceId = getArguments().getString("spaceId");
+            spaceType = getArguments().getString("spaceType");
         }
 
         addCycleButton.setOnClickListener(v -> addCycleView());
@@ -102,6 +103,7 @@ public class CreateMachineFragment extends Fragment {
         machineData.put("type", type);
         machineData.put("buildingId", buildingId);
         machineData.put("spaceId", spaceId);
+        machineData.put("spaceType", spaceType);
 
         if (type.equals("wash")) {
             List<Map<String, Object>> ciclos = new ArrayList<>();

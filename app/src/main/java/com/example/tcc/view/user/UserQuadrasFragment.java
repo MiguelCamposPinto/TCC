@@ -15,8 +15,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tcc.R;
-import com.example.tcc.model.Machine;
-import com.example.tcc.view.adapter.MachineAdapter;
+import com.example.tcc.model.Quadra;
+import com.example.tcc.view.adapter.QuadraAdapter;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
@@ -24,18 +24,19 @@ import com.google.firebase.firestore.ListenerRegistration;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UserMachinesFragment extends Fragment {
+public class UserQuadrasFragment extends Fragment {
 
     private static final String ARG_BUILDING_ID = "buildingId";
     private static final String ARG_SPACE_ID = "spaceId";
 
     private String buildingId, spaceId, spaceType;
     private FirebaseFirestore db;
-    private final List<Machine> machineList = new ArrayList<>();
+    private final List<Quadra> quadraList = new ArrayList<>();
     private final List<ListenerRegistration> listeners = new ArrayList<>();
 
     private RecyclerView recyclerView;
-    private MachineAdapter adapter;
+    private QuadraAdapter adapter;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -51,48 +52,47 @@ public class UserMachinesFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_user_machines, container, false);
+        View view = inflater.inflate(R.layout.fragment_user_quadras, container, false);
 
-        recyclerView = view.findViewById(R.id.recyclerUserMachines);
+        recyclerView = view.findViewById(R.id.recyclerUserQuadras);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-
         db = FirebaseFirestore.getInstance();
 
-        adapter = new MachineAdapter(machineList, machine -> {
-            NavController navController = Navigation.findNavController(requireView());
+        adapter = new QuadraAdapter(quadraList, quadra -> {
+            NavController nav = Navigation.findNavController(requireView());
             Bundle args = new Bundle();
             args.putString("buildingId", buildingId);
             args.putString("spaceId", spaceId);
-            args.putString("machineId", machine.getId());
+            args.putString("quadrasId", quadra.getId());
             args.putString("spaceType", spaceType);
-            navController.navigate(R.id.action_userMachinesFragment_to_userScheduleMachineFragment, args);
+            nav.navigate(R.id.action_userQuadrasFragment_to_userScheduleQuadraFragment, args);
         });
 
         recyclerView.setAdapter(adapter);
 
-        loadMachines();
+        loadQuadras();
 
         return view;
     }
 
-    private void loadMachines() {
+    private void loadQuadras() {
         ListenerRegistration reg = db.collection("buildings")
                 .document(buildingId)
                 .collection("spaces")
                 .document(spaceId)
-                .collection("machines")
+                .collection("quadras")
                 .addSnapshotListener((snapshot, error) -> {
                     if (error != null) {
-                        Toast.makeText(getContext(), "Erro ao escutar máquinas", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Erro ao carregar quadras", Toast.LENGTH_SHORT).show();
                         return;
                     }
 
-                    machineList.clear();
+                    quadraList.clear();
                     for (DocumentSnapshot doc : snapshot.getDocuments()) {
-                        Machine machine = doc.toObject(Machine.class);
-                        if (machine != null) {
-                            machine.setId(doc.getId());
-                            verificarStatusMaquinaEmTempoReal(machine);
+                        Quadra q = doc.toObject(Quadra.class);
+                        if (q != null) {
+                            q.setId(doc.getId());
+                            escutarStatusEmUso(q);
                         }
                     }
                 });
@@ -100,32 +100,30 @@ public class UserMachinesFragment extends Fragment {
         listeners.add(reg);
     }
 
-    private void verificarStatusMaquinaEmTempoReal(Machine machine) {
+    private void escutarStatusEmUso(Quadra quadra) {
         ListenerRegistration reg = db.collection("buildings")
                 .document(buildingId)
                 .collection("spaces")
                 .document(spaceId)
-                .collection("machines")
-                .document(machine.getId())
+                .collection("quadras")
+                .document(quadra.getId())
                 .collection("reservations")
                 .whereEqualTo("status", "em_andamento")
                 .addSnapshotListener((snapshot, error) -> {
                     if (error != null) return;
 
                     boolean emUso = snapshot != null && !snapshot.isEmpty();
-                    machine.setStatus(emUso ? "em_uso" : "livre");
+                    quadra.setStatus(emUso ? "em_uso" : "livre");
 
                     boolean jaExiste = false;
-                    for (Machine m : machineList) {
-                        if (m.getId().equals(machine.getId())) {
-                            m.setStatus(machine.getStatus());
+                    for (Quadra q : quadraList) {
+                        if (q.getId().equals(quadra.getId())) {
+                            q.setStatus(quadra.getStatus());
                             jaExiste = true;
                             break;
                         }
                     }
-                    if (!jaExiste) {
-                        machineList.add(machine);
-                    }
+                    if (!jaExiste) quadraList.add(quadra);
 
                     adapter.notifyDataSetChanged();
                 });
@@ -136,9 +134,7 @@ public class UserMachinesFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        for (ListenerRegistration reg : listeners) {
-            reg.remove();
-        }
+        for (ListenerRegistration reg : listeners) reg.remove();
         listeners.clear();
     }
 }

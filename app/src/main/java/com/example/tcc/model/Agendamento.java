@@ -14,17 +14,19 @@ public class Agendamento {
     private String spaceId;
     private String machineId;
     private int durationMin;
+    private String spaceType;
 
     public Agendamento() {
     }
 
-    public Agendamento(String userId, String date, String startTime, String endTime, String status, int durationMin) {
+    public Agendamento(String userId, String date, String startTime, String endTime, String status, int durationMin, String spaceType) {
         this.userId = userId;
         this.date = date;
         this.startTime = startTime;
         this.endTime = endTime;
         this.status = status;
         this.durationMin = durationMin;
+        this.spaceType = spaceType;
     }
 
     public String getUserId() {
@@ -130,5 +132,13 @@ public class Agendamento {
 
     public void setMachineId(String machineId) {
         this.machineId = machineId;
+    }
+
+    public String getSpaceType() {
+        return spaceType;
+    }
+
+    public void setSpaceType(String spaceType) {
+        this.spaceType = spaceType;
     }
 }

@@ -68,6 +68,7 @@ public class BuildingDetailsFragment extends Fragment {
             Bundle args = new Bundle();
             args.putString("buildingId", buildingId);
             args.putString("spaceId", space.getId());
+            args.putString("type",space.getType());
             navController.navigate(R.id.action_buildingDetailsFragment_to_spacesListFragment, args);
         });
         recyclerSpaces.setAdapter(spacesAdapter);

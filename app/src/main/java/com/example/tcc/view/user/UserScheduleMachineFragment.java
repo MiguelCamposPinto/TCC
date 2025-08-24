@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tcc.R;
 import com.example.tcc.model.Agendamento;
+import com.example.tcc.view.adapter.HorarioAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -38,7 +39,7 @@ public class UserScheduleMachineFragment extends Fragment {
     private static final String ARG_SPACE_ID = "spaceId";
     private static final String ARG_MACHINE_ID = "machineId";
 
-    private String buildingId, spaceId, machineId;
+    private String buildingId, spaceId, machineId, spaceType;
     private FirebaseFirestore db;
     private FirebaseAuth auth;
 
@@ -65,6 +66,7 @@ public class UserScheduleMachineFragment extends Fragment {
             buildingId = getArguments().getString(ARG_BUILDING_ID);
             spaceId = getArguments().getString(ARG_SPACE_ID);
             machineId = getArguments().getString(ARG_MACHINE_ID);
+            spaceType = getArguments().getString("spaceType");
         }
 
         textSelectedDate = view.findViewById(R.id.textSelectedDate);
@@ -308,7 +310,7 @@ public class UserScheduleMachineFragment extends Fragment {
                                 .get().addOnSuccessListener(machineDoc -> {
                                     String machineName = machineDoc.getString("name");
 
-                                    Agendamento ag = new Agendamento(userId, date, startTime, endTime, "confirmado", durationMin);
+                                    Agendamento ag = new Agendamento(userId, date, startTime, endTime, "confirmado", durationMin, spaceType);
                                     ag.setUserName(userName);
                                     ag.setSpaceName(espacoNome);
                                     ag.setMachineName(machineName);
@@ -352,45 +354,4 @@ public class UserScheduleMachineFragment extends Fragment {
         }
     }
 
-    public interface OnHorarioClickListener {
-        void onClick(String hora);
-    }
-
-    public class HorarioAdapter extends RecyclerView.Adapter<HorarioAdapter.ViewHolder> {
-        private final List<String> horarios;
-        private final OnHorarioClickListener listener;
-
-        public HorarioAdapter(List<String> horarios, OnHorarioClickListener listener) {
-            this.horarios = horarios;
-            this.listener = listener;
-        }
-
-        @NonNull
-        @Override
-        public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_horario_slot, parent, false);
-            return new ViewHolder(v);
-        }
-
-        @Override
-        public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-            String hora = horarios.get(position);
-            holder.textHorario.setText(hora);
-            holder.textHorario.setOnClickListener(v -> listener.onClick(hora));
-        }
-
-        @Override
-        public int getItemCount() {
-            return horarios.size();
-        }
-
-        public class ViewHolder extends RecyclerView.ViewHolder {
-            TextView textHorario;
-
-            public ViewHolder(@NonNull View itemView) {
-                super(itemView);
-                textHorario = itemView.findViewById(R.id.textHorarioSlot);
-            }
-        }
-    }
 }

@@ -44,7 +44,7 @@ exports.atualizarAgendamentos = functions
         await admin.messaging().send({
           notification: {
             title: "Sua reserva começa em 5 minutos!",
-            body: "Prepare-se para utilizar a máquina. Chegue no horário!",
+            body: "Prepare-se para utilizar a reserva. Chegue no horário!",
           },
           token: token,
         }).catch(e => console.warn("Erro ao enviar notificação pré-início:", e.message));
@@ -55,7 +55,7 @@ exports.atualizarAgendamentos = functions
         await admin.messaging().send({
           notification: {
             title: "Sua reserva termina em 5 minutos!",
-            body: "Se adiante para não atrapalhar o próximo uso. Libere a máquina no horário.",
+            body: "Se adiante para não atrapalhar o próximo uso. Libere o uso do recurso no horário.",
           },
           token: token,
         }).catch(e => console.warn("Erro ao enviar notificação pré-fim:", e.message));
@@ -70,7 +70,7 @@ exports.atualizarAgendamentos = functions
           await admin.messaging().send({
             notification: {
               title: "Sua reserva começou!",
-              body: "Sua máquina já está disponível. Vá até o local para usá-la.",
+              body: "Sua reserva já está disponível. Vá até o local para usá-la.",
             },
             token: token,
           }).catch(e => console.warn("Erro ao enviar notificação início:", e.message));

@@ -1,22 +1,23 @@
 package com.example.tcc.model;
 
-public class Machine extends Resource{
+public class Salao extends Resource{
     private String id;
     private String name;
+    private int capacidadeMax;
     private String status;
-    private String espacoId;
     private String spaceType;
 
-    public Machine() {
+    public Salao() {
     }
 
-    public Machine(String id, String name, String status, String espacoId) {
+    public Salao(String id, String name, int capacidadeMax, String status) {
         this.id = id;
         this.name = name;
+        this.capacidadeMax = capacidadeMax;
         this.status = status;
-        this.espacoId = espacoId;
     }
 
+    // Getters
     public String getId() {
         return id;
     }
@@ -25,28 +26,29 @@ public class Machine extends Resource{
         return name;
     }
 
+    public int getCapacidadeMax() {
+        return capacidadeMax;
+    }
+
     public String getStatus() {
         return status;
     }
 
-    public String getEspacoId() {
-        return espacoId;
-    }
-
+    // Setters
     public void setId(String id) {
         this.id = id;
     }
 
-    public void setName(String name) {
+    public void setNome(String name) {
         this.name = name;
+    }
+
+    public void setCapacidadeMaxima(int capacidadeMaxima) {
+        this.capacidadeMax = capacidadeMaxima;
     }
 
     public void setStatus(String status) {
         this.status = status;
-    }
-
-    public void setEspacoId(String espacoId) {
-        this.espacoId = espacoId;
     }
 
     public String getSpaceType() {

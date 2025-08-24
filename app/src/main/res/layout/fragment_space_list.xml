@@ -20,7 +20,7 @@
         android:id="@+id/buttonAddMachine"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Adicionar Máquina"
+        android:text="Adicionar"
         android:textStyle="bold"
         android:textColor="#FFFFFF"
         android:backgroundTint="#2196F3"

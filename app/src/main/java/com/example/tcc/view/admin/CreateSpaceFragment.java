@@ -46,7 +46,7 @@ public class CreateSpaceFragment extends Fragment {
 
         spinnerSpaceType = view.findViewById(R.id.spinnerSpaceType);
 
-        String[] spaceTypes = {"lavanderia", "quadra", "salao"};
+        String[] spaceTypes = {"lavanderias", "quadras", "saloes"};
         ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(),
                 android.R.layout.simple_spinner_item, spaceTypes);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);

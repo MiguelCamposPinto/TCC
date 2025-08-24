@@ -1,0 +1,24 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/containerSalaoAgendamento"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:gravity="center"
+    android:background="?android:colorBackground">
+
+    <TextView
+        android:id="@+id/textSelectedDateSalao"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Escolha a data"
+        android:textSize="16sp"
+        android:textColor="?android:textColorPrimary"
+        android:padding="12dp"
+        android:background="@drawable/bg_input"
+        android:gravity="center"
+        android:layout_marginBottom="32dp" />
+
+    <!-- Aqui poderia ter outras informações como regras, etc -->
+
+</LinearLayout>

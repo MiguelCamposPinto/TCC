@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layout_create_salao"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <EditText
+        android:id="@+id/edtNomeSalao"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Nome do salão" />
+
+    <EditText
+        android:id="@+id/edtCapacidadeMax"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Capacidade máxima"
+        android:inputType="number" />
+
+    <Button
+        android:id="@+id/btnSalvarSalao"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Salvar salão"
+        android:layout_marginTop="24dp"
+        android:backgroundTint="#2196F3"
+        android:textColor="#FFFFFF"/>
+</LinearLayout>

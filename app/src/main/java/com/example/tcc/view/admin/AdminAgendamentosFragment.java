@@ -24,21 +24,23 @@ public class AdminAgendamentosFragment extends Fragment {
 
     private static final String ARG_BUILDING_ID = "buildingId";
     private static final String ARG_SPACE_ID = "spaceId";
-    private static final String ARG_MACHINE_ID = "machineId";
+    private static final String ARG_RESOURCE = "resource";
+    private static final String ARG_RESOURCE_ID = "resourceId";
 
-    private String buildingId, spaceId, machineId;
+    private String buildingId, spaceId, resource, resourceId;
     private FirebaseFirestore db;
     private RecyclerView recycler;
     private final List<Agendamento> agendamentos = new ArrayList<>();
     private final List<ListenerRegistration> listeners = new ArrayList<>();
     private AgendamentoAdapter adapter;
 
-    public static AdminAgendamentosFragment newInstance(String buildingId, String spaceId, String machineId) {
+    public static AdminAgendamentosFragment newInstance(String buildingId, String spaceId, String resourceId, String resource) {
         AdminAgendamentosFragment fragment = new AdminAgendamentosFragment();
         Bundle args = new Bundle();
         args.putString(ARG_BUILDING_ID, buildingId);
         args.putString(ARG_SPACE_ID, spaceId);
-        args.putString(ARG_MACHINE_ID, machineId);
+        args.putString(ARG_RESOURCE_ID, resourceId);
+        args.putString(ARG_RESOURCE, resource);
         fragment.setArguments(args);
         return fragment;
     }
@@ -56,7 +58,8 @@ public class AdminAgendamentosFragment extends Fragment {
         if (getArguments() != null) {
             buildingId = getArguments().getString(ARG_BUILDING_ID);
             spaceId = getArguments().getString(ARG_SPACE_ID);
-            machineId = getArguments().getString(ARG_MACHINE_ID);
+            resourceId = getArguments().getString(ARG_RESOURCE_ID);
+            resource = getArguments().getString(ARG_RESOURCE);
         }
 
         db = FirebaseFirestore.getInstance();
@@ -75,8 +78,8 @@ public class AdminAgendamentosFragment extends Fragment {
                 .document(buildingId)
                 .collection("spaces")
                 .document(spaceId)
-                .collection("machines")
-                .document(machineId)
+                .collection(resource)
+                .document(resourceId)
                 .collection("reservations")
                 .addSnapshotListener((snapshot, error) -> {
                     if (error != null) {

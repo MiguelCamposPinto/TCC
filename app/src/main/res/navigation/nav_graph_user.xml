@@ -37,6 +37,12 @@
         <action
             android:id="@+id/action_userSpacesFragment_to_userMachinesFragment"
             app:destination="@id/userMachinesFragment" />
+        <action
+            android:id="@+id/action_userSpacesFragment_to_userQuadrasFragment"
+            app:destination="@id/userQuadrasFragment" />
+        <action
+            android:id="@+id/action_userSpacesFragment_to_userSaloesFragment"
+            app:destination="@id/userSaloesFragment" />
     </fragment>
     <fragment
         android:id="@+id/userMachinesFragment"
@@ -50,4 +56,28 @@
         android:id="@+id/userScheduleMachineFragment"
         android:name="com.example.tcc.view.user.UserScheduleMachineFragment"
         android:label="UserScheduleMachineFragment" />
+    <fragment
+        android:id="@+id/userQuadrasFragment"
+        android:name="com.example.tcc.view.user.UserQuadrasFragment"
+        android:label="UserQuadrasFragment" >
+        <action
+            android:id="@+id/action_userQuadrasFragment_to_userScheduleQuadraFragment"
+            app:destination="@id/userScheduleQuadraFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/userScheduleQuadraFragment"
+        android:name="com.example.tcc.view.user.UserScheduleQuadraFragment"
+        android:label="UserScheduleQuadraFragment" />
+    <fragment
+        android:id="@+id/userSaloesFragment"
+        android:name="com.example.tcc.view.user.UserSaloesFragment"
+        android:label="UserSaloesFragment" >
+        <action
+            android:id="@+id/action_userSaloesFragment_to_userScheduleSalaoFragment"
+            app:destination="@id/userScheduleSalaoFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/userScheduleSalaoFragment"
+        android:name="com.example.tcc.view.user.UserScheduleSalaoFragment"
+        android:label="UserScheduleSalaoFragment" />
 </navigation>

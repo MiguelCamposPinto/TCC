@@ -55,12 +55,16 @@ public class AgendamentoAdapter extends RecyclerView.Adapter<AgendamentoAdapter.
                 .append(agendamento.getSpaceName() != null ? agendamento.getSpaceName() : "-")
                 .append("\n");
 
-        info.append("Máquina: ")
+        info.append("Recurso: ")
                 .append(agendamento.getMachineName() != null ? agendamento.getMachineName() : "-")
                 .append("\n");
 
         info.append("Data: ").append(agendamento.getDate()).append("\n");
-        info.append("Hora: ").append(agendamento.getStartTime()).append(" - ").append(agendamento.getEndTime()).append("\n");
+
+        if (!agendamento.getSpaceType().equals("saloes")){
+            info.append("Hora: ").append(agendamento.getStartTime()).append(" - ").append(agendamento.getEndTime()).append("\n");
+        }
+
         info.append("Status: ").append(agendamento.getStatus());
 
         holder.textInfo.setText(info.toString());

@@ -14,36 +14,41 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.Space;
 import android.widget.TextView;
 
 import com.example.tcc.R;
 import com.example.tcc.model.Machine;
-import com.example.tcc.model.Spaces;
+import com.example.tcc.model.Quadra;
+import com.example.tcc.model.Resource;
+import com.example.tcc.model.Salao;
+import com.example.tcc.view.adapter.GenericAdapter;
 import com.example.tcc.view.adapter.MachineAdapter;
-import com.example.tcc.view.adapter.SpacesAdapter;
+import com.example.tcc.view.adapter.QuadraAdapter;
+import com.example.tcc.view.adapter.SalaoAdapter;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 public class SpacesListFragment extends Fragment {
 
     private static final String ARG_BUILDING_ID = "buildingId";
     private static final String ARG_SPACE_ID = "spaceId";
+    private static final String ARG_SPACE_TYPE = "type";
 
-    private String buildingId, spaceId;
+    private String buildingId, spaceId, spaceType, place;
     private TextView spaceName;
     private Button buttonAddMachine;
     private RecyclerView recyclerMachines;
 
-    private List<Machine> machineList = new ArrayList<>();
-    private MachineAdapter machineAdapter;
+    private List<Resource> resourceList = new ArrayList<>();
+    private GenericAdapter resourceAdapter;
+
 
     private FirebaseFirestore db;
     private final List<ListenerRegistration> listeners = new ArrayList<>();
@@ -66,29 +71,35 @@ public class SpacesListFragment extends Fragment {
         if (getArguments() != null) {
             buildingId = getArguments().getString(ARG_BUILDING_ID);
             spaceId = getArguments().getString(ARG_SPACE_ID);
+            spaceType = getArguments().getString(ARG_SPACE_TYPE);
         }
 
-        machineAdapter = new MachineAdapter(machineList, machine -> {
-            Fragment frag = AdminAgendamentosFragment.newInstance(buildingId, spaceId, machine.getId());
-            requireActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.admin_fragment_container, frag)
-                    .addToBackStack(null)
-                    .commit();
-        });
-
         recyclerMachines.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerMachines.setAdapter(machineAdapter);
+        recyclerMachines.setAdapter((RecyclerView.Adapter) resourceAdapter);
 
         buttonAddMachine.setOnClickListener(v -> {
+            if (spaceType == null) {
+                return;
+            }
             NavController navController = Navigation.findNavController(requireView());
             Bundle args = new Bundle();
             args.putString("buildingId", buildingId);
             args.putString("spaceId", spaceId);
-            navController.navigate(R.id.action_spacesListFragment_to_createMachineFragment, args);
+            args.putString("spaceType", spaceType);
+            switch (spaceType) {
+                case "lavanderias":
+                    navController.navigate(R.id.action_spacesListFragment_to_createMachineFragment, args);
+                    break;
+                case "quadras":
+                    navController.navigate(R.id.action_spacesListFragment_to_createQuadraFragment, args);
+                    break;
+                case "saloes":
+                    navController.navigate(R.id.action_spacesListFragment_to_createSalaoFragment, args);
+                    break;
+            }
         });
 
         loadSpaceInfo();
-        loadMachines();
     }
 
     private void loadSpaceInfo() {
@@ -100,6 +111,18 @@ public class SpacesListFragment extends Fragment {
                 .addOnSuccessListener(doc -> {
                     if (doc.exists()) {
                         spaceName.setText(doc.getString("name"));
+                        switch (Objects.requireNonNull(spaceType)) {
+                            case "lavanderias":
+                                place = "machines";
+                                break;
+                            case "quadras":
+                                place = "quadras";
+                                break;
+                            case "saloes":
+                                place = "saloes";
+                                break;
+                        }
+                        loadMachines();
                     }
                 });
     }
@@ -109,60 +132,131 @@ public class SpacesListFragment extends Fragment {
                 .document(buildingId)
                 .collection("spaces")
                 .document(spaceId)
-                .collection("machines")
+                .collection(place)
                 .addSnapshotListener((snapshot, error) -> {
                     if (error != null || snapshot == null) return;
 
-                    machineList.clear();
+                    List<Resource> updatedList = new ArrayList<>();
                     Set<String> idsAdicionados = new HashSet<>();
 
                     for (DocumentSnapshot doc : snapshot.getDocuments()) {
-                        Machine machine = doc.toObject(Machine.class);
-                        machine.setId(doc.getId());
+                        Resource resource = parseResource(doc);
+                        if (resource == null) continue;
 
-                        if (!idsAdicionados.contains(machine.getId())) {
-                            idsAdicionados.add(machine.getId());
-                            verificarStatusMaquinaEmTempoReal(machine);
+                        if (!idsAdicionados.contains(resource.getId())) {
+                            idsAdicionados.add(resource.getId());
+                            updatedList.add(resource);
+                            verificarStatusEmTempoReal(resource);
                         }
                     }
+
+                    resourceList = updatedList;
+                    atualizarAdapter(resourceList);
                 });
 
         listeners.add(reg);
+
     }
 
-    private void verificarStatusMaquinaEmTempoReal(Machine machine) {
+    private void verificarStatusEmTempoReal(Resource resource) {
         ListenerRegistration reg = db.collection("buildings")
                 .document(buildingId)
                 .collection("spaces")
                 .document(spaceId)
-                .collection("machines")
-                .document(machine.getId())
+                .collection(place)
+                .document(resource.getId())
                 .collection("reservations")
                 .whereEqualTo("status", "em_andamento")
                 .addSnapshotListener((snapshot, error) -> {
                     if (error != null) return;
 
                     boolean emUso = snapshot != null && !snapshot.isEmpty();
-                    machine.setStatus(emUso ? "em_uso" : "livre");
+                    resource.setStatus(emUso ? "em_uso" : "livre");
 
-                    boolean atualizada = false;
-                    for (Machine m : machineList) {
-                        if (m.getId().equals(machine.getId())) {
-                            m.setStatus(machine.getStatus());
-                            atualizada = true;
+                    for (Resource r : resourceList) {
+                        if (r.getId().equals(resource.getId())) {
+                            r.setStatus(resource.getStatus());
                             break;
                         }
                     }
 
-                    if (!atualizada) {
-                        machineList.add(machine);
-                    }
-
-                    machineAdapter.notifyDataSetChanged();
+                    if (resourceAdapter != null)
+                        resourceAdapter.notifyDataSetChanged();
                 });
 
         listeners.add(reg);
     }
+
+
+    private void atualizarAdapter(List<? extends Resource> list) {
+        switch (spaceType) {
+            case "lavanderias":
+                List<Machine> mList = castList(list, Machine.class);
+                resourceAdapter = new MachineAdapter(mList, machine -> {
+                    callAgendamentos(machine.getId());
+                });
+                break;
+            case "quadras":
+                List<Quadra> qList = castList(list, Quadra.class);
+                resourceAdapter = new QuadraAdapter(qList, quadra -> {
+                    callAgendamentos(quadra.getId());
+                });
+                break;
+            case "saloes":
+                List<Salao> sList = castList(list, Salao.class);
+                resourceAdapter = new SalaoAdapter(sList, salao -> {
+                    callAgendamentos(salao.getId());
+                });
+                break;
+        }
+
+        recyclerMachines.setAdapter((RecyclerView.Adapter<?>) resourceAdapter);
+    }
+
+    private void callAgendamentos(String id) {
+        Fragment frag = AdminAgendamentosFragment.newInstance(buildingId, spaceId, id, place);
+        requireActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.admin_fragment_container, frag)
+                .addToBackStack(null)
+                .commit();
+    }
+
+
+    private Resource parseResource(DocumentSnapshot doc) {
+        Resource resource = null;
+
+        switch (spaceType) {
+            case "lavanderias":
+                resource = doc.toObject(Machine.class);
+                break;
+            case "quadras":
+                resource = doc.toObject(Quadra.class);
+                break;
+            case "saloes":
+                resource = doc.toObject(Salao.class);
+                break;
+        }
+
+        if (resource != null) {
+            resource.setId(doc.getId());
+            resource.setStatus("livre");
+        }
+
+        return resource;
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> List<T> castList(List<?> list, Class<T> clazz) {
+        List<T> result = new ArrayList<>();
+        for (Object o : list) {
+            if (clazz.isInstance(o)) {
+                result.add((T) o);
+            }
+        }
+        return result;
+    }
+
 
     @Override
     public void onDestroyView() {

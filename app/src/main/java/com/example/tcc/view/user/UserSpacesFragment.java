@@ -23,6 +23,7 @@ import com.google.firebase.firestore.ListenerRegistration;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 public class UserSpacesFragment extends Fragment {
@@ -59,7 +60,14 @@ public class UserSpacesFragment extends Fragment {
             Bundle args = new Bundle();
             args.putString("buildingId", buildingId);
             args.putString("spaceId", space.getId());
-            navController.navigate(R.id.action_userSpacesFragment_to_userMachinesFragment, args);
+            args.putString("spaceType", space.getType());
+            if (Objects.equals(space.getType(), "lavanderias")){
+                navController.navigate(R.id.action_userSpacesFragment_to_userMachinesFragment, args);
+            } else if(Objects.equals(space.getType(), "quadras")) {
+                navController.navigate(R.id.action_userSpacesFragment_to_userQuadrasFragment, args);
+            } else if(Objects.equals(space.getType(), "saloes")) {
+                navController.navigate(R.id.action_userSpacesFragment_to_userSaloesFragment, args);
+            }
         });
 
         recyclerView.setAdapter(adapter);
