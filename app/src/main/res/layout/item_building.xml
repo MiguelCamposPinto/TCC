@@ -16,12 +16,22 @@
         android:padding="16dp">
 
         <TextView
-            android:id="@+id/textSpaceName"
+            android:id="@+id/textBuildingName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Nome do espaço"
+            android:text="Nome do Predio"
             android:textSize="18sp"
             android:textStyle="bold"
             android:textColor="?android:textColorPrimary" />
+
+        <TextView
+            android:id="@+id/textBuildingAddress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Address"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="?android:textColorPrimary" />
+
     </LinearLayout>
 </androidx.cardview.widget.CardView>

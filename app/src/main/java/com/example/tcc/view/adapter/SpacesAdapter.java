@@ -30,7 +30,7 @@ public class SpacesAdapter extends RecyclerView.Adapter<SpacesAdapter.ViewHolder
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(android.R.layout.simple_list_item_2, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_space, parent, false);
         return new ViewHolder(view);
     }
 
@@ -51,7 +51,7 @@ public class SpacesAdapter extends RecyclerView.Adapter<SpacesAdapter.ViewHolder
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
-            name = itemView.findViewById(android.R.id.text1);
+            name = itemView.findViewById(R.id.textSpaceName);
         }
     }
 }

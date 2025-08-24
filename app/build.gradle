@@ -36,6 +36,7 @@ dependencies {
     implementation libs.firebase.analytics
     implementation libs.appcompat
     implementation libs.material
+    implementation libs.material3
     implementation libs.activity
     implementation libs.navigation.fragment.v270
     implementation libs.navigation.ui.v270

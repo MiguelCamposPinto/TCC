@@ -30,7 +30,7 @@ public class BuildingAdapter extends RecyclerView.Adapter<BuildingAdapter.Buildi
     @Override
     public BuildingViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(android.R.layout.simple_list_item_2, parent, false);
+                .inflate(R.layout.item_building, parent, false);
         return new BuildingViewHolder(view);
     }
 
@@ -58,8 +58,8 @@ public class BuildingAdapter extends RecyclerView.Adapter<BuildingAdapter.Buildi
 
         public BuildingViewHolder(@NonNull View itemView) {
             super(itemView);
-            name = itemView.findViewById(android.R.id.text1);
-            address = itemView.findViewById(android.R.id.text2);
+            name = itemView.findViewById(R.id.textBuildingName);
+            address = itemView.findViewById(R.id.textBuildingAddress);
         }
     }
 }
