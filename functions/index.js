@@ -100,3 +100,163 @@ exports.atualizarAgendamentos = functions
     res.status(500).send("Erro interno: " + err.message);
   }
 });
+
+exports.notifyNewChatMessage = functions
+  .region("southamerica-east1")
+  .firestore
+  .document("buildings/{buildingId}/chat/{messageId}")
+  .onCreate(async (snap, context) => {
+    const { buildingId, messageId } = context.params;
+    const msg = snap.data();
+
+    // Campos do documento do chat
+    const text = (msg?.message || "").toString();
+    const senderId = (msg?.senderId || "").toString();
+    const senderName = (msg?.senderName || "Novo comentário").toString();
+
+    try {
+      // 0) Nome do prédio para admins
+      let buildingName = buildingId;
+      try {
+        const bDoc = await db.collection("buildings").doc(buildingId).get();
+        if (bDoc.exists) {
+          buildingName = bDoc.get("name") || bDoc.get("title") || buildingId;
+        }
+      } catch (_) {}
+
+      // 1) USERS do prédio atual (recebem, menos o remetente)
+      const usersSnap = await db.collection("users")
+        .where("type", "==", "user")
+        .where("buildingId", "==", buildingId)
+        .get();
+
+      // 2) ADMINS que administram esse prédio (recebem, menos o remetente)
+      const adminsSnap = await db.collection("users")
+        .where("type", "==", "admin")
+        .where("buildings", "array-contains", buildingId)
+        .get();
+
+      // 3) Coletar tokens (mantendo doc junto para filtrar remetente)
+      const collectTargets = (qs) => {
+        const arr = [];
+        qs.forEach(doc => {
+          const t = doc.get("fcmToken");
+          if (typeof t === "string" && t.trim()) {
+            arr.push({ token: t.trim(), doc });
+          }
+        });
+        return arr;
+      };
+      let userTargets  = collectTargets(usersSnap);
+      let adminTargets = collectTargets(adminsSnap);
+
+      // 4) Excluir SEMPRE o remetente (compara doc.id e campo uid)
+      const filterOutSender = (targets) => targets.filter(({ doc }) => {
+        const docUid = doc.get("uid"); // agora você já preencheu para admin também
+        const isSender = (doc.id === senderId) || (docUid && docUid === senderId);
+        return !isSender;
+      });
+      userTargets  = filterOutSender(userTargets);
+      adminTargets = filterOutSender(adminTargets);
+
+      // 5) Deduplicar tokens e transformar em string[]
+      const toTokenArray = (targets) => Array.from(new Set(targets.map(t => t.token)));
+      const userTokens  = toTokenArray(userTargets);
+      const adminTokens = toTokenArray(adminTargets);
+
+      if (userTokens.length === 0 && adminTokens.length === 0) {
+        console.log("[notifyNewChatMessage] Sem destinatários após filtros.");
+        return null;
+      }
+
+      // 6) Payloads
+      const preview = text.length > 120 ? `${text.substring(0, 117)}...` : text;
+
+      const notificationUser = {
+        title: `[${buildingName}] ${senderName} no chat`,
+        body: preview,
+      };
+      const dataUser = {
+        type: "chat",
+        buildingId,
+        buildingName,
+        messageId,
+        senderId,
+        senderName,
+      };
+
+      // 7) Envio em chunks (<= 500)
+      const sendChunks = async (tokens, notification, data) => {
+        const chunkSize = 500;
+        let ok = 0, fail = 0;
+        for (let i = 0; i < tokens.length; i += chunkSize) {
+          const res = await admin.messaging().sendEachForMulticast({
+            tokens: tokens.slice(i, i + chunkSize),
+            notification,
+            data,
+            android: {
+              priority: "high",
+              notification: { channelId: "default_channel", sound: "default" },
+            },
+            apns: { payload: { aps: { sound: "default" } } },
+          });
+          ok  += res.successCount;
+          fail += res.failureCount;
+        }
+        return { ok, fail };
+      };
+
+      let okTotal = 0, failTotal = 0;
+
+      const r = await sendChunks(userTokens, notificationUser, dataUser);
+      okTotal += r.ok; failTotal += r.fail;
+
+
+
+      console.log(`[notifyNewChatMessage] OK - ${okTotal} sucesso, ${failTotal} falhas`);
+      return null;
+
+    } catch (e) {
+      console.error("[notifyNewChatMessage] Erro:", e);
+      return null;
+    }
+  });
+
+exports.attachTokenToUser = functions
+  .region("southamerica-east1")
+  .https.onCall(async (data, context) => {
+    if (!context.auth) {
+      throw new functions.https.HttpsError("unauthenticated", "Login necessário.");
+    }
+    const uid = context.auth.uid;                  // <- usa o uid autenticado
+    const token = (data?.token || "").trim();
+    if (!token) {
+      throw new functions.https.HttpsError("invalid-argument", "Token ausente.");
+    }
+
+    const db = admin.firestore();
+
+    // localizar o doc do usuário pelo campo 'uid'
+    const targetSnap = await db.collection("users").where("uid", "==", uid).limit(1).get();
+    if (targetSnap.empty) {
+      throw new functions.https.HttpsError("not-found", "users doc com este uid não encontrado.");
+    }
+    const targetRef = targetSnap.docs[0].ref;
+
+    // remover este token de quaisquer OUTROS docs
+    const dupSnap = await db.collection("users").where("fcmToken", "==", token).get();
+
+    const batch = db.batch();
+    dupSnap.forEach(d => {
+      if (d.ref.path !== targetRef.path) {
+        batch.update(d.ref, { fcmToken: admin.firestore.FieldValue.delete() });
+      }
+    });
+
+    // anexar o token ao usuário atual
+    batch.set(targetRef, { fcmToken: token }, { merge: true });
+    await batch.commit();
+
+    return { ok: true, attachedTo: targetRef.id, removedFrom: Math.max(dupSnap.size - 1, 0) };
+  });
+

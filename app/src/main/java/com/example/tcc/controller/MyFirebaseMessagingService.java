@@ -52,7 +52,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                     .setSmallIcon(R.drawable.ic_launcher_foreground)
                     .setContentTitle(titulo)
                     .setContentText(corpo)
-                    .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+                    .setPriority(NotificationCompat.PRIORITY_HIGH);
 
             NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
