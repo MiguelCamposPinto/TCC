@@ -35,6 +35,17 @@ public class RegisterActivity extends AppCompatActivity {
 
         authService = new AuthService();
 
+        radioGroupTipo.setOnCheckedChangeListener((group, checkedId) -> {
+            if (checkedId == R.id.radioButtonAdmin) {
+                editTextNome.setText("Admin");
+                editTextNome.setEnabled(false);
+            } else {
+                editTextNome.setText("");
+                editTextNome.setEnabled(true);
+            }
+        });
+
+
         buttonCadastrar.setOnClickListener(view -> {
             String email = editTextEmail.getText().toString();
             String password = editTextSenha.getText().toString();

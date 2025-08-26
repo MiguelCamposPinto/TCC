@@ -1,6 +1,7 @@
 package com.example.tcc.view.admin;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 import androidx.activity.EdgeToEdge;
@@ -11,6 +12,9 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.example.tcc.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 public class AdminMainActivity extends AppCompatActivity {
 
@@ -26,6 +30,23 @@ public class AdminMainActivity extends AppCompatActivity {
         NavController navController = navHostFragment.getNavController();
 
         NavigationUI.setupWithNavController(bottomNav, navController);
+
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(task -> {
+                    if (!task.isSuccessful()) {
+                        Log.w("FCM", "Fetching FCM registration token failed", task.getException());
+                        return;
+                    }
+
+                    String token = task.getResult();
+                    String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+                    FirebaseFirestore.getInstance().collection("users")
+                            .document(userId)
+                            .update("fcmToken", token)
+                            .addOnSuccessListener(aVoid -> Log.d("FCM", "Token atualizado com sucesso"))
+                            .addOnFailureListener(e -> Log.w("FCM", "Erro ao salvar token", e));
+                });
 
         navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
             int id = destination.getId();

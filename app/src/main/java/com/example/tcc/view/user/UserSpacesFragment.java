@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -33,6 +34,7 @@ public class UserSpacesFragment extends Fragment {
     private String buildingId;
     private FirebaseFirestore db;
     private RecyclerView recyclerView;
+    private Button buttonChat;
     private final List<Spaces> spaceList = new ArrayList<>();
     private final List<ListenerRegistration> listeners = new ArrayList<>();
     private SpacesAdapter adapter;
@@ -53,6 +55,8 @@ public class UserSpacesFragment extends Fragment {
         recyclerView = view.findViewById(R.id.recyclerUserSpaces);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
+        buttonChat = view.findViewById(R.id.buttonChat);
+
         db = FirebaseFirestore.getInstance();
 
         adapter = new SpacesAdapter(spaceList, space -> {
@@ -68,6 +72,12 @@ public class UserSpacesFragment extends Fragment {
             } else if(Objects.equals(space.getType(), "saloes")) {
                 navController.navigate(R.id.action_userSpacesFragment_to_userSaloesFragment, args);
             }
+        });
+
+        buttonChat.setOnClickListener(v -> {
+            Bundle args = new Bundle();
+            args.putString("buildingId", buildingId);
+            Navigation.findNavController(requireView()).navigate(R.id.action_userSpacesFragment_to_chatFragment, args);
         });
 
         recyclerView.setAdapter(adapter);

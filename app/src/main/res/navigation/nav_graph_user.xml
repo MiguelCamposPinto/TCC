@@ -43,6 +43,9 @@
         <action
             android:id="@+id/action_userSpacesFragment_to_userSaloesFragment"
             app:destination="@id/userSaloesFragment" />
+        <action
+            android:id="@+id/action_userSpacesFragment_to_chatFragment"
+            app:destination="@id/chatFragment" />
     </fragment>
     <fragment
         android:id="@+id/userMachinesFragment"
@@ -80,4 +83,8 @@
         android:id="@+id/userScheduleSalaoFragment"
         android:name="com.example.tcc.view.user.UserScheduleSalaoFragment"
         android:label="UserScheduleSalaoFragment" />
+    <fragment
+        android:id="@+id/chatFragment"
+        android:name="com.example.tcc.view.ChatFragment"
+        android:label="ChatFragment" />
 </navigation>

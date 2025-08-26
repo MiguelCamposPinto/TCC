@@ -34,6 +34,14 @@
         android:backgroundTint="#2196F3"
         android:textColor="#FFFFFF"/>
 
+    <Button
+        android:id="@+id/buttonChat"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Chat"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#2196F3" />
 
     <Button
         android:id="@+id/buttonAddSpace"
@@ -45,6 +53,7 @@
         android:backgroundTint="#2196F3"
         android:layout_marginBottom="16dp"
         android:paddingVertical="12dp" />
+
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerSpaces"
