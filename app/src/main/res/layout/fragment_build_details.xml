@@ -54,6 +54,17 @@
         android:layout_marginBottom="16dp"
         android:paddingVertical="12dp" />
 
+    <Button
+        android:id="@+id/buttonDashboard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Dashboard"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#2196F3"
+        android:layout_marginBottom="16dp"
+        android:paddingVertical="12dp" />
+
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerSpaces"

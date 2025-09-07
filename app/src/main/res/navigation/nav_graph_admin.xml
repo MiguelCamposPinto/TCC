@@ -33,14 +33,14 @@
             android:id="@+id/action_buildingDetailsFragment_to_createSpaceFragment"
             app:destination="@id/createSpaceFragment" />
         <action
-            android:id="@+id/action_buildingDetailsFragment_to_adminDashboardFragment"
-            app:destination="@id/adminDashboardFragment" />
-        <action
             android:id="@+id/action_buildingDetailsFragment_to_usersInBuildingFragment"
             app:destination="@id/usersInBuildingFragment" />
         <action
             android:id="@+id/action_buildingDetailsFragment_to_chatFragment2"
             app:destination="@id/chatFragment2" />
+        <action
+            android:id="@+id/action_buildingDetailsFragment_to_dashboardFragment"
+            app:destination="@id/dashboardFragment" />
     </fragment>
     <fragment
         android:id="@+id/spacesListFragment"
@@ -65,10 +65,6 @@
         android:name="com.example.tcc.view.admin.CreateMachineFragment"
         android:label="CreateMachineFragment" />
     <fragment
-        android:id="@+id/adminDashboardFragment"
-        android:name="com.example.tcc.view.admin.AdminDashboardFragment"
-        android:label="AdminDashboardFragment" />
-    <fragment
         android:id="@+id/usersInBuildingFragment"
         android:name="com.example.tcc.view.admin.UsersInBuildingFragment"
         android:label="UsersInBuildingFragment" />
@@ -84,4 +80,8 @@
         android:id="@+id/chatFragment2"
         android:name="com.example.tcc.view.ChatFragment"
         android:label="ChatFragment" />
+    <fragment
+        android:id="@+id/dashboardFragment"
+        android:name="com.example.tcc.view.admin.DashboardFragment"
+        android:label="DashboardFragment" />
 </navigation>

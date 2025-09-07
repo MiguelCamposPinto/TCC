@@ -1,6 +1,7 @@
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 admin.initializeApp();
+const { Client } = require("pg");
 
 const db = admin.firestore();
 
@@ -259,4 +260,127 @@ exports.attachTokenToUser = functions
 
     return { ok: true, attachedTo: targetRef.id, removedFrom: Math.max(dupSnap.size - 1, 0) };
   });
+
+
+ const { Pool } = require('pg');
+ // --------- PG CONFIG ---------
+ const PG_CONFIG = {
+   host: 'ep-lingering-darkness-ac74wunk-pooler.sa-east-1.aws.neon.tech',
+   port: 5432,
+   database: 'neondb',
+   user: 'neondb_owner',
+   password: 'npg_z5RxvhwW3CTo',
+   ssl: require,
+ };
+
+ const pool = new Pool(PG_CONFIG);
+
+ // Helpers
+ const toTime = (v) => (typeof v === 'string' && /^\d{2}:\d{2}$/.test(v) ? v : null);
+ const toDateOnly = (v) => (typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v) ? v : null);
+
+ const UPSERT_SQL = `
+   INSERT INTO reservas (
+     id, building_id, date, duration_min, start_time, end_time, status,
+     firestore_path, machine_id, machine_name, space_id, space_name, space_type,
+     user_id, user_name, updated_at
+   )
+   VALUES (
+     $1, $2, $3, $4, $5, $6, $7,
+     $8, $9, $10, $11, $12, $13,
+     $14, $15, NOW()
+   )
+   ON CONFLICT (id) DO UPDATE SET
+     building_id    = EXCLUDED.building_id,
+     date           = EXCLUDED.date,
+     duration_min   = EXCLUDED.duration_min,
+     start_time     = EXCLUDED.start_time,
+     end_time       = EXCLUDED.end_time,
+     status         = EXCLUDED.status,
+     firestore_path = EXCLUDED.firestore_path,
+     machine_id     = EXCLUDED.machine_id,
+     machine_name   = EXCLUDED.machine_name,
+     space_id       = EXCLUDED.space_id,
+     space_name     = EXCLUDED.space_name,
+     space_type     = EXCLUDED.space_type,
+     user_id        = EXCLUDED.user_id,
+     user_name      = EXCLUDED.user_name,
+     updated_at     = NOW();
+ `;
+
+ const DELETE_SQL = `DELETE FROM reservas WHERE id = $1;`;
+
+ exports.syncAgendamento = functions
+   .region("southamerica-east1")
+   .firestore
+   .document("buildings/{buildingId}/spaces/{spaceId}/{resourceType}/{resourceId}/reservations/{reservaId}")
+   .onWrite(async (change, context) => {
+     const {
+       buildingId,
+       spaceId,
+       resourceType,
+       resourceId,
+       reservaId
+     } = context.params;
+
+     // Garante que estamos em uma coleção válida
+     const allowed = new Set(['machines', 'quadras', 'saloes']);
+     if (!allowed.has(resourceType)) {
+       console.warn('Ignorando resourceType não suportado:', resourceType);
+       return null;
+     }
+
+     const client = await pool.connect();
+     try {
+       // DELETE
+       if (!change.after.exists) {
+         await client.query(DELETE_SQL, [reservaId]);
+         console.log('Removido do Postgres:', reservaId);
+         return null;
+       }
+
+       // CREATE/UPDATE
+       const data = change.after.data() || {};
+       const id = reservaId;
+
+       const date = toDateOnly(data.date);                   // 'YYYY-MM-DD'
+       const durationMin = data.durationMin ?? null;         // int
+       const startTime = toTime(data.startTime);             // 'HH:MM'
+       const endTime = toTime(data.endTime);                 // 'HH:MM'
+       const status = data.status || 'indefinido';
+
+       const firestorePath = data.firestorePath ?? null;
+
+       // nomes (se não vierem no doc da reserva, tenta pegar do recurso/espaço)
+       // Para pegar os nomes do recurso/espaço, faríamos reads extras no Firestore.
+       // Para não custar reads, usamos o que veio no documento:
+       const machineName = data.machineName ?? null;
+       const spaceName   = data.spaceName ?? null;
+       const spaceType   = data.spaceType ?? resourceType;   // fallback: nome da coleção
+
+       const userId   = data.userId || '';
+       const userName = data.userName ?? null;
+
+       // Valida campos NOT NULL
+       if (!date || !startTime || !endTime || !userId) {
+         console.warn('Reserva com campos obrigatórios ausentes. id=', id, { date, startTime, endTime, userId });
+         // Opcional: abortar para não quebrar a linha
+         // return null;
+       }
+
+       await client.query(UPSERT_SQL, [
+         id, buildingId, date, durationMin, startTime, endTime, status,
+         firestorePath, resourceId, machineName, spaceId, spaceName, spaceType,
+         userId, userName
+       ]);
+
+       console.log('Upsert OK:', id, '(', resourceType, ')');
+       return null;
+     } catch (err) {
+       console.error('Erro ao sincronizar reserva:', err);
+       throw err;
+     } finally {
+       client.release();
+     }
+   });
 
