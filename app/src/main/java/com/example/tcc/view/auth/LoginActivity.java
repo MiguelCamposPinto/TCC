@@ -17,7 +17,7 @@ import android.widget.Toast;
 public class LoginActivity extends AppCompatActivity implements LoginCallback {
 
     private EditText emailInput, passwordInput;
-    private Button loginButton, buttonGoToRegistry;
+    private Button loginButton, buttonGoToRegistry, buttonRecPassword;
     private AuthService authService;
 
     @Override
@@ -29,7 +29,7 @@ public class LoginActivity extends AppCompatActivity implements LoginCallback {
         passwordInput = findViewById(R.id.editTextSenha);
         loginButton = findViewById(R.id.buttonLogin);
         buttonGoToRegistry = findViewById(R.id.buttonGoToRegistry);
-
+        buttonRecPassword = findViewById(R.id.buttonRecPassword);
         authService = new AuthService();
 
         loginButton.setOnClickListener(view -> {
@@ -44,6 +44,7 @@ public class LoginActivity extends AppCompatActivity implements LoginCallback {
             }
         });
         buttonGoToRegistry.setOnClickListener(view -> startActivity(new Intent(this, RegisterActivity.class)));
+        buttonRecPassword.setOnClickListener(view -> startActivity(new Intent(this, PasswordRecActivity.class)));
     }
 
     @Override

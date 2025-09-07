@@ -24,7 +24,7 @@ public class DashboardFragment extends Fragment {
 
     // ATUALIZE SEMPRE para a URL PÚBLICA ATUAL do Metabase (ngrok muda!):
     private static final String BASE_PUBLIC_URL =
-            "https://545a5301f367.ngrok-free.app/public/dashboard/36a81a27-2960-48eb-bb49-b4f981ca27ed";
+            "https://21e64750b3bf.ngrok-free.app/public/dashboard/36a81a27-2960-48eb-bb49-b4f981ca27ed";
 
     private String buildingId;
 
