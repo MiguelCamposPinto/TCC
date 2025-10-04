@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class UserScheduleQuadraFragment extends Fragment {
 
@@ -137,27 +138,62 @@ public class UserScheduleQuadraFragment extends Fragment {
         String userId = auth.getCurrentUser().getUid();
         String endTime = calcularHoraFim(startTime);
 
-        db.collection("buildings").document(buildingId)
-                .collection("spaces").document(spaceId)
-                .collection("quadras").document(quadraId)
-                .collection("reservations")
-                .whereEqualTo("date", date)
-                .get()
-                .addOnSuccessListener(snapshot -> {
-                    for (DocumentSnapshot doc : snapshot.getDocuments()) {
-                        String status = doc.getString("status");
-                        String ini = doc.getString("startTime");
-                        String fim = doc.getString("endTime");
+        verificarAgendamentoAtivo(userId, temAtivo -> {
+            if (temAtivo) {
+                Toast.makeText(getContext(), "Você já possui um agendamento ativo nesta máquina.", Toast.LENGTH_LONG).show();
+                return;
+            }
 
-                        if ("confirmado".equals(status) || "em_andamento".equals(status)) {
-                            if (conflita(startTime, endTime, ini, fim)) {
-                                Toast.makeText(getContext(), "Horário em conflito", Toast.LENGTH_SHORT).show();
-                                return;
+            db.collection("buildings").document(buildingId)
+                    .collection("spaces").document(spaceId)
+                    .collection("quadras").document(quadraId)
+                    .collection("reservations")
+                    .whereEqualTo("date", date)
+                    .get()
+                    .addOnSuccessListener(snapshot -> {
+                        for (DocumentSnapshot doc : snapshot.getDocuments()) {
+                            String status = doc.getString("status");
+                            String ini = doc.getString("startTime");
+                            String fim = doc.getString("endTime");
+
+                            if ("confirmado".equals(status) || "em_andamento".equals(status)) {
+                                if (conflita(startTime, endTime, ini, fim)) {
+                                    Toast.makeText(getContext(), "Horário em conflito", Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
                             }
                         }
-                    }
 
-                    salvarAgendamento(userId, date, startTime, endTime);
+                        salvarAgendamento(userId, date, startTime, endTime);
+                    });
+        });
+
+    }
+
+    private void verificarAgendamentoAtivo(String userId, UserScheduleQuadraFragment.OnAgendamentoCheckListener listener) {
+        db.collection("buildings")
+                .document(buildingId)
+                .collection("spaces")
+                .document(spaceId)
+                .collection("quadras")
+                .document(quadraId)
+                .collection("reservations")
+                .whereEqualTo("userId", userId)
+                .get()
+                .addOnSuccessListener(snapshot -> {
+                    boolean temAgendamentoAtivo = false;
+                    for (DocumentSnapshot doc : snapshot.getDocuments()) {
+                        String status = doc.getString("status");
+                        if ("confirmado".equals(status) || "em_andamento".equals(status)) {
+                            temAgendamentoAtivo = true;
+                            break;
+                        }
+                    }
+                    listener.onCheckFinished(temAgendamentoAtivo);
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(getContext(), "Erro ao verificar agendamentos: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    listener.onCheckFinished(false);
                 });
     }
 
@@ -219,5 +255,9 @@ public class UserScheduleQuadraFragment extends Fragment {
 
     private boolean conflita(String ini1, String fim1, String ini2, String fim2) {
         return ini1.compareTo(fim2) < 0 && fim1.compareTo(ini2) > 0;
+    }
+
+    private interface OnAgendamentoCheckListener {
+        void onCheckFinished(boolean temAgendamentoAtivo);
     }
 }

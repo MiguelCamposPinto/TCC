@@ -32,6 +32,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class UserScheduleMachineFragment extends Fragment {
 
@@ -253,7 +254,41 @@ public class UserScheduleMachineFragment extends Fragment {
         }
 
         String endTime = calcularHoraFim(startTime, durationMin);
+        verificarAgendamentoAtivo(userId, temAtivo -> {
+            if (temAtivo) {
+                Toast.makeText(getContext(), "Você já possui um agendamento ativo nesta máquina.", Toast.LENGTH_LONG).show();
+                return;
+            }
 
+            db.collection("buildings")
+                    .document(buildingId)
+                    .collection("spaces")
+                    .document(spaceId)
+                    .collection("machines")
+                    .document(machineId)
+                    .collection("reservations")
+                    .whereEqualTo("date", date)
+                    .get()
+                    .addOnSuccessListener(snapshot -> {
+                        for (DocumentSnapshot doc : snapshot.getDocuments()) {
+                            String status = doc.getString("status");
+                            String inicio = doc.getString("startTime");
+                            String fim = doc.getString("endTime");
+
+                            if ("confirmado".equals(status) || "em_andamento".equals(status)) {
+                                if (conflita(startTime, endTime, inicio, fim)) {
+                                    Toast.makeText(getContext(), "Horário em conflito com outro agendamento.", Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
+                            }
+                        }
+
+                        salvarAgendamento(userId, date, startTime, endTime,durationMin);
+                    });
+        });
+    }
+
+    private void verificarAgendamentoAtivo(String userId, OnAgendamentoCheckListener listener) {
         db.collection("buildings")
                 .document(buildingId)
                 .collection("spaces")
@@ -261,25 +296,25 @@ public class UserScheduleMachineFragment extends Fragment {
                 .collection("machines")
                 .document(machineId)
                 .collection("reservations")
-                .whereEqualTo("date", date)
+                .whereEqualTo("userId", userId)
                 .get()
                 .addOnSuccessListener(snapshot -> {
+                    boolean temAgendamentoAtivo = false;
                     for (DocumentSnapshot doc : snapshot.getDocuments()) {
                         String status = doc.getString("status");
-                        String inicio = doc.getString("startTime");
-                        String fim = doc.getString("endTime");
-
                         if ("confirmado".equals(status) || "em_andamento".equals(status)) {
-                            if (conflita(startTime, endTime, inicio, fim)) {
-                                Toast.makeText(getContext(), "Horário em conflito com outro agendamento.", Toast.LENGTH_SHORT).show();
-                                return;
-                            }
+                            temAgendamentoAtivo = true;
+                            break;
                         }
                     }
-
-                    salvarAgendamento(userId, date, startTime, endTime,durationMin);
+                    listener.onCheckFinished(temAgendamentoAtivo);
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(getContext(), "Erro ao verificar agendamentos: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    listener.onCheckFinished(false);
                 });
     }
+
 
     private boolean conflita(String ini1, String fim1, String ini2, String fim2) {
         return ini1.compareTo(fim2) < 0 && fim1.compareTo(ini2) > 0;
@@ -337,7 +372,6 @@ public class UserScheduleMachineFragment extends Fragment {
         });
     }
 
-
     private String calcularHoraFim(String startTime, int durMin) {
         try {
             String[] p = startTime.split(":");
@@ -354,4 +388,7 @@ public class UserScheduleMachineFragment extends Fragment {
         }
     }
 
+    private interface OnAgendamentoCheckListener {
+        void onCheckFinished(boolean temAgendamentoAtivo);
+    }
 }

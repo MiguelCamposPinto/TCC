@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment;
 import com.example.tcc.R;
 import com.example.tcc.model.Agendamento;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Calendar;
@@ -89,9 +90,47 @@ public class UserScheduleSalaoFragment extends Fragment {
                     if (ocupado) {
                         Toast.makeText(getContext(), "Salão já reservado para essa data", Toast.LENGTH_LONG).show();
                     } else {
+                        String userId = auth.getCurrentUser().getUid();
+                        verificarAgendamentoAtivoSalao(userId, date);
+                    }
+                })
+                .addOnFailureListener(e ->
+                        Toast.makeText(getContext(), "Erro ao verificar disponibilidade: " + e.getMessage(), Toast.LENGTH_SHORT).show()
+                );
+    }
+
+    /**
+     * Verifica se o usuário já possui um agendamento ativo neste salão (em qualquer data)
+     */
+    private void verificarAgendamentoAtivoSalao(String userId, String date) {
+        db.collection("buildings").document(buildingId)
+                .collection("spaces").document(spaceId)
+                .collection("saloes").document(salaoId)
+                .collection("reservations")
+                .whereEqualTo("userId", userId)
+                .get()
+                .addOnSuccessListener(snapshot -> {
+                    boolean temAgendamentoAtivo = false;
+
+                    for (DocumentSnapshot doc : snapshot.getDocuments()) {
+                        String status = doc.getString("status");
+                        if ("confirmado".equals(status) || "em_andamento".equals(status)) {
+                            temAgendamentoAtivo = true;
+                            break;
+                        }
+                    }
+
+                    if (temAgendamentoAtivo) {
+                        Toast.makeText(getContext(),
+                                "Você já possui um agendamento ativo neste salão.",
+                                Toast.LENGTH_LONG).show();
+                    } else {
                         fazerAgendamento(date);
                     }
-                });
+                })
+                .addOnFailureListener(e ->
+                        Toast.makeText(getContext(), "Erro ao verificar agendamento ativo: " + e.getMessage(), Toast.LENGTH_SHORT).show()
+                );
     }
 
     private void fazerAgendamento(String date) {
@@ -111,7 +150,8 @@ public class UserScheduleSalaoFragment extends Fragment {
                                 .get().addOnSuccessListener(salaoDoc -> {
                                     String salaoNome = salaoDoc.getString("name");
 
-                                    Agendamento ag = new Agendamento(userId, date, "00:00", "23:59", "confirmado", 1440, spaceType);
+                                    Agendamento ag = new Agendamento(userId, date, "00:00", "23:59",
+                                            "confirmado", 1440, spaceType);
                                     ag.setUserName(userName);
                                     ag.setSpaceName(espacoNome);
                                     ag.setMachineName(salaoNome); // reaproveitando campo
@@ -125,9 +165,16 @@ public class UserScheduleSalaoFragment extends Fragment {
                                             .collection("reservations")
                                             .add(ag)
                                             .addOnSuccessListener(r -> {
-                                                Toast.makeText(requireContext(), "Agendado com sucesso!", Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(requireContext(),
+                                                        "Agendado com sucesso!",
+                                                        Toast.LENGTH_SHORT).show();
                                                 requireActivity().getSupportFragmentManager().popBackStack();
-                                            });
+                                            })
+                                            .addOnFailureListener(e ->
+                                                    Toast.makeText(getContext(),
+                                                            "Erro ao salvar agendamento: " + e.getMessage(),
+                                                            Toast.LENGTH_SHORT).show()
+                                            );
                                 });
                     });
         });

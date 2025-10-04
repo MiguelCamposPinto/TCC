@@ -38,7 +38,7 @@ public class PasswordRecActivity extends AppCompatActivity {
                     .sendPasswordResetEmail(email)
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
-                            Toast.makeText(this, "E-mail de recuperação enviado!", Toast.LENGTH_LONG).show();
+                            Toast.makeText(this, "E-mail de recuperação enviado! (cheque spam box)", Toast.LENGTH_LONG).show();
                         } else {
                             Toast.makeText(this, "Erro: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                         }

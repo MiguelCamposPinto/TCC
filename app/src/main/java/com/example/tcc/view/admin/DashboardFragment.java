@@ -24,7 +24,7 @@ public class DashboardFragment extends Fragment {
 
     // ATUALIZE SEMPRE para a URL PÚBLICA ATUAL do Metabase (ngrok muda!):
     private static final String BASE_PUBLIC_URL =
-            "https://21e64750b3bf.ngrok-free.app/public/dashboard/36a81a27-2960-48eb-bb49-b4f981ca27ed";
+            "mudar/public/dashboard/36a81a27-2960-48eb-bb49-b4f981ca27ed?building=";
 
     private String buildingId;
 
@@ -61,7 +61,7 @@ public class DashboardFragment extends Fragment {
         if (!TextUtils.isEmpty(buildingId)) {
             try {
                 String enc = URLEncoder.encode(buildingId, "UTF-8");
-                url = BASE_PUBLIC_URL + "?building=" + buildingId;
+                url = BASE_PUBLIC_URL + buildingId;
             } catch (UnsupportedEncodingException ignored) {}
         } else {
         }
