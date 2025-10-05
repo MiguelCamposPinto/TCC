@@ -6,4 +6,7 @@
         <item name="android:layout_marginTop">0dp</item>
         <item name="android:paddingTop">0dp</item>
     </style>
+    <style name="CustomRadioButton" parent="Widget.AppCompat.CompoundButton.RadioButton">
+        <item name="buttonTint">#2196F3</item>
+    </style>
 </resources>

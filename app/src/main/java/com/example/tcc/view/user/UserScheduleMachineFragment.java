@@ -8,13 +8,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -32,7 +32,6 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class UserScheduleMachineFragment extends Fragment {
 
@@ -47,7 +46,7 @@ public class UserScheduleMachineFragment extends Fragment {
     private TextView textSelectedDate;
     private RecyclerView recyclerHorarios;
     private HorarioAdapter adapter;
-    private LinearLayout datePickerContainer;
+    private ConstraintLayout datePickerContainer;
     private Spinner spinnerCiclo;
 
     @Override

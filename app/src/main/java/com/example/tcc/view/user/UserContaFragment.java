@@ -3,6 +3,8 @@ package com.example.tcc.view.user;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -168,9 +170,23 @@ public class UserContaFragment extends Fragment {
             }
         });
 
-        builder.setNegativeButton("Cancelar", null);
-        builder.show();
+        builder.setNegativeButton("Cancelar", (dialog, which) -> dialog.dismiss());
+
+        AlertDialog dialog = builder.create();
+        dialog.setOnShowListener(dlg -> {
+            Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+            Button negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+
+            // Fundo azul e texto branco nos dois botões
+            positiveButton.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#2196F3")));
+            negativeButton.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#2196F3")));
+            positiveButton.setTextColor(Color.WHITE);
+            negativeButton.setTextColor(Color.WHITE);
+        });
+
+        dialog.show();
     }
+
 
     private void deletarContaComSenha(String senha) {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();

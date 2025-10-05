@@ -87,7 +87,7 @@ exports.atualizarAgendamentos = functions
           await admin.messaging().send({
             notification: {
               title: "Sua reserva terminou!",
-              body: "O tempo da sua reserva foi encerrado. Obrigado por usar o LavaFácil!",
+              body: "O tempo da sua reserva foi encerrado!",
             },
             token: token,
           }).catch(e => console.warn("Erro ao enviar notificação fim:", e.message));

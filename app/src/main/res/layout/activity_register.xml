@@ -1,15 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?android:colorBackground"
-    android:padding="24dp">
+    tools:context=".view.auth.RegisterActivity">
+
+    <!-- 🖼️ Imagem de fundo -->
+    <ImageView
+        android:id="@+id/backgroundImage"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/fundo"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <View
+        android:id="@+id/overlay"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="?android:colorBackground"
+        android:alpha="0.65"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:id="@+id/formContainer"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:gravity="center_horizontal">
+        android:gravity="center_horizontal"
+        android:paddingHorizontal="32dp"
+        android:paddingBottom="32dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
 
         <TextView
             android:id="@+id/registerTitle"
@@ -21,6 +53,7 @@
             android:textColor="?android:textColorPrimary"
             android:layout_marginBottom="32dp" />
 
+        <!-- Campos -->
         <EditText
             android:id="@+id/editTextNome"
             android:layout_width="match_parent"
@@ -67,7 +100,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Usuário"
-                android:textColor="?android:textColorPrimary" />
+                android:textColor="?android:textColorPrimary"
+                android:checked="true"
+                style="@style/CustomRadioButton" />
 
             <RadioButton
                 android:id="@+id/radioButtonAdmin"
@@ -75,7 +110,8 @@
                 android:layout_height="wrap_content"
                 android:text="Administrador"
                 android:layout_marginStart="24dp"
-                android:textColor="?android:textColorPrimary" />
+                android:textColor="?android:textColorPrimary"
+                style="@style/CustomRadioButton" />
         </RadioGroup>
 
         <Button
@@ -86,7 +122,8 @@
             android:backgroundTint="#2196F3"
             android:textColor="#FFFFFF"
             android:textStyle="bold"
-            android:paddingVertical="12dp" />
+            android:paddingVertical="12dp"
+            android:layout_marginBottom="12dp" />
 
         <Button
             android:id="@+id/buttonGoToLogin"
@@ -97,5 +134,7 @@
             android:textColor="#FFFFFF"
             android:textStyle="bold"
             android:paddingVertical="12dp" />
+
     </LinearLayout>
-</ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
